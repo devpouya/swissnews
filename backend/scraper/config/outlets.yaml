@@ -1,0 +1,226 @@
+# Swiss News Outlets Configuration
+# Configuration file for Selenium-based scraping of Swiss news outlets
+# Each outlet includes URL, selectors, timeouts, and retry settings
+
+outlets:
+  # Neue Zürcher Zeitung (German)
+  nzz:
+    name: "Neue Zürcher Zeitung"
+    url: "https://www.nzz.ch"
+    language: "de"
+    selectors:
+      article_links: "a.teaser__link, a[data-qa='teaser-link']"
+      title: "h1.headline, h1[data-qa='headline']"
+      content: ".article__body p, .content__body p"
+      author: ".author__name, .byline__author"
+      date: ".article__date, .publish-date"
+    timeouts:
+      page_load: 30
+      element_wait: 10
+    retry:
+      max_attempts: 3
+      delay: 2
+    user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+
+  # Tages-Anzeiger (German)
+  tagesanzeiger:
+    name: "Tages-Anzeiger"
+    url: "https://www.tagesanzeiger.ch"
+    language: "de"
+    selectors:
+      article_links: "a.teaser-link, a[data-testid='teaser-link']"
+      title: "h1.article-title, h1[data-testid='title']"
+      content: ".article-content p, .story-content p"
+      author: ".author-name, .byline"
+      date: ".article-date, .publication-date"
+    timeouts:
+      page_load: 25
+      element_wait: 8
+    retry:
+      max_attempts: 3
+      delay: 1.5
+
+  # 20 Minuten (German)
+  zwanzig_minuten:
+    name: "20 Minuten"
+    url: "https://www.20min.ch"
+    language: "de"
+    selectors:
+      article_links: "a.teaser__link, a[href*='/story/']"
+      title: "h1.story__title, h1.article__headline"
+      content: ".story__text p, .article__text p"
+      author: ".story__author, .article__author"
+      date: ".story__date, .article__date"
+    timeouts:
+      page_load: 20
+      element_wait: 12
+    retry:
+      max_attempts: 4
+      delay: 2
+
+  # Le Temps (French)
+  le_temps:
+    name: "Le Temps"
+    url: "https://www.letemps.ch"
+    language: "fr"
+    selectors:
+      article_links: "a.article-link, a[href*='/article/']"
+      title: "h1.article__title, h1.headline"
+      content: ".article__content p, .content__text p"
+      author: ".article__author, .author-name"
+      date: ".article__date, .publication-date"
+    timeouts:
+      page_load: 30
+      element_wait: 10
+    retry:
+      max_attempts: 3
+      delay: 2
+
+  # Tribune de Genève (French)
+  tribune_geneve:
+    name: "Tribune de Genève"
+    url: "https://www.tdg.ch"
+    language: "fr"
+    selectors:
+      article_links: "a.teaser-link, a[data-testid='article-link']"
+      title: "h1.article-title, h1[data-testid='headline']"
+      content: ".article-body p, .story-text p"
+      author: ".author-info, .byline-author"
+      date: ".publish-date, .article-timestamp"
+    timeouts:
+      page_load: 25
+      element_wait: 8
+    retry:
+      max_attempts: 3
+      delay: 2
+
+  # Corriere del Ticino (Italian)
+  corriere_ticino:
+    name: "Corriere del Ticino"
+    url: "https://www.cdt.ch"
+    language: "it"
+    selectors:
+      article_links: "a.article-teaser, a[href*='/articolo/']"
+      title: "h1.article-title, h1.headline"
+      content: ".article-text p, .content-body p"
+      author: ".article-author, .author-name"
+      date: ".article-date, .publish-time"
+    timeouts:
+      page_load: 30
+      element_wait: 10
+    retry:
+      max_attempts: 3
+      delay: 2
+
+  # La Regione Ticino (Italian)
+  la_regione:
+    name: "La Regione Ticino"
+    url: "https://www.laregione.ch"
+    language: "it"
+    selectors:
+      article_links: "a.news-link, a[href*='/news/']"
+      title: "h1.news-title, h1.article-headline"
+      content: ".news-content p, .article-body p"
+      author: ".news-author, .article-byline"
+      date: ".news-date, .publication-info"
+    timeouts:
+      page_load: 25
+      element_wait: 8
+    retry:
+      max_attempts: 3
+      delay: 1.5
+
+  # SRF (Swiss Radio and Television - German)
+  srf:
+    name: "SRF"
+    url: "https://www.srf.ch"
+    language: "de"
+    selectors:
+      article_links: "a.teaser__link, a[data-teaser-tracking*='article']"
+      title: "h1.article-title, h1[data-testid='title']"
+      content: ".article-content p, .text-content p"
+      author: ".article-author, .byline-name"
+      date: ".article-date, .timestamp"
+    timeouts:
+      page_load: 35
+      element_wait: 12
+    retry:
+      max_attempts: 4
+      delay: 3
+
+  # RTS (Radio Télévision Suisse - French)
+  rts:
+    name: "RTS"
+    url: "https://www.rts.ch"
+    language: "fr"
+    selectors:
+      article_links: "a.article-teaser__link, a[href*='/info/']"
+      title: "h1.article__title, h1.content-title"
+      content: ".article__text p, .content__body p"
+      author: ".article__author, .content-author"
+      date: ".article__date, .content-date"
+    timeouts:
+      page_load: 30
+      element_wait: 10
+    retry:
+      max_attempts: 3
+      delay: 2
+
+  # RSI (Radiotelevisione Svizzera - Italian)
+  rsi:
+    name: "RSI"
+    url: "https://www.rsi.ch"
+    language: "it"
+    selectors:
+      article_links: "a.teaser-link, a[href*='/news/']"
+      title: "h1.article-title, h1.news-headline"
+      content: ".article-text p, .news-content p"
+      author: ".article-author, .news-byline"
+      date: ".article-date, .news-timestamp"
+    timeouts:
+      page_load: 30
+      element_wait: 10
+    retry:
+      max_attempts: 3
+      delay: 2
+
+# Default configuration applied to all outlets if not specified
+defaults:
+  timeouts:
+    page_load: 30
+    element_wait: 10
+  retry:
+    max_attempts: 3
+    delay: 2
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+
+# Configuration validation rules
+validation:
+  required_fields:
+    - name
+    - url
+    - language
+    - selectors
+  required_selectors:
+    - article_links
+    - title
+    - content
+  supported_languages:
+    - de  # German
+    - fr  # French
+    - it  # Italian
+    - rm  # Romansch
+  timeout_limits:
+    page_load:
+      min: 10
+      max: 60
+    element_wait:
+      min: 5
+      max: 30
+  retry_limits:
+    max_attempts:
+      min: 1
+      max: 10
+    delay:
+      min: 0.5
+      max: 10
