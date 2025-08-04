@@ -84,10 +84,6 @@ def clean_text(text: str) -> str:
     text = text.replace("&quot;", '"')
     text = text.replace("&#39;", "'")
 
-    # Remove extra whitespace and normalize
-    text = re.sub(r"\s+", " ", text)
-    text = text.strip()
-
     # Remove common web artifacts
     text = re.sub(r"\[.*?\]", "", text)  # Remove bracketed content like [Advertisement]
     text = re.sub(
@@ -104,7 +100,11 @@ def clean_text(text: str) -> str:
     text = re.sub(
         r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", "[email]", text
     )
-    text = re.sub(r"\b\+?[\d\s\-\(\)]{8,}\b", "[phone]", text)
+    text = re.sub(r"\+?[\d\s\-\(\)]{8,}", "[phone]", text)
+
+    # Remove extra whitespace and normalize (after all replacements)
+    text = re.sub(r"\s+", " ", text)
+    text = text.strip()
 
     return text.strip()
 
