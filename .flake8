@@ -1,0 +1,39 @@
+[flake8]
+max-line-length = 88
+select = E,W,F,C,B,B950
+ignore =
+    # E203: whitespace before ':' (conflicts with black)
+    E203,
+    # E501: line too long (handled by black)
+    E501,
+    # W503: line break before binary operator (conflicts with black)
+    W503,
+    # E402: module level import not at top of file
+    E402
+
+exclude =
+    .git,
+    __pycache__,
+    .venv,
+    venv,
+    .pytest_cache,
+    .coverage,
+    htmlcov,
+    *.egg-info,
+    build,
+    dist,
+    migrations,
+    node_modules
+
+per-file-ignores =
+    # Allow unused imports in __init__.py files
+    __init__.py:F401
+    # Allow imports not at top in settings files
+    settings.py:E402
+    # Allow long lines in migrations
+    */migrations/*.py:E501
+
+max-complexity = 10
+
+# Docstring conventions
+docstring-convention = google

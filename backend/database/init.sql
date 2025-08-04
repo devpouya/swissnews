@@ -1,9 +1,9 @@
 -- Swiss News Aggregator Database Initialization Script
 -- This script initializes the complete database schema for the Swiss News Aggregator
--- 
+--
 -- Usage:
 --   psql -d swissnews -f backend/database/init.sql
---   
+--
 -- Or with Docker:
 --   docker exec -i postgres_container psql -U username -d swissnews < backend/database/init.sql
 --
@@ -86,7 +86,7 @@ INSERT INTO outlets (name, url, language, owner, city, canton, occurrence, statu
 ('Neue Zürcher Zeitung', 'https://www.nzz.ch', 'de', 'NZZ-Mediengruppe', 'Zürich', 'Zürich', 'Daily', 'current'),
 ('Tages-Anzeiger', 'https://www.tagesanzeiger.ch', 'de', 'TX Group', 'Zurich', 'Canton of Zurich', 'Daily', 'current'),
 
--- French language outlets  
+-- French language outlets
 ('24 heures', 'https://www.24heures.ch', 'fr', 'TX Group', 'Lausanne', 'Canton of Vaud', 'Daily', 'current'),
 ('Journal du Jura', 'https://www.journaldujura.ch', 'fr', 'Gassmann AG', 'Biel/Bienne', 'Canton of Bern', 'Daily', 'current'),
 ('Le Matin', 'https://www.lematin.ch', 'fr', 'Edipresse', 'Lausanne', 'Canton of Vaud', 'Daily', 'current'),
@@ -107,7 +107,7 @@ INSERT INTO outlets (name, url, language, owner, city, canton, occurrence, statu
 
 -- Display summary statistics
 \echo 'Database Summary:'
-SELECT 
+SELECT
     'Outlets' as table_name,
     COUNT(*) as record_count,
     COUNT(DISTINCT language) as languages
@@ -116,24 +116,24 @@ WHERE is_active = TRUE
 
 UNION ALL
 
-SELECT 
+SELECT
     'Articles' as table_name,
     COALESCE(COUNT(*), 0) as record_count,
     COUNT(DISTINCT language) as languages
 FROM articles;
 
 \echo 'Outlets by language:'
-SELECT 
+SELECT
     language,
     COUNT(*) as outlet_count
-FROM outlets 
+FROM outlets
 WHERE is_active = TRUE
 GROUP BY language
 ORDER BY outlet_count DESC;
 
 \echo 'Schema version:'
-SELECT version, applied_at, description 
-FROM schema_migrations 
+SELECT version, applied_at, description
+FROM schema_migrations
 ORDER BY applied_at DESC;
 
 \echo ''

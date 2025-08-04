@@ -17,7 +17,7 @@ This document outlines the methodology and results of researching Swiss news out
 The Wikipedia source is organized into sections by language, with both current and defunct outlets:
 
 1. **German Language**: 104 outlets total (40 current, 64 defunct)
-2. **French Language**: 70 outlets total (25 current, 45 defunct)  
+2. **French Language**: 70 outlets total (25 current, 45 defunct)
 3. **Italian Language**: 22 outlets total (7 current, 15 defunct)
 4. **Romansch Language**: 15 outlets total (3 current, 12 defunct)
 5. **Other Languages**: 6 outlets total (2 current, 4 defunct)
@@ -42,7 +42,7 @@ The Wikipedia source is organized into sections by language, with both current a
    - `original_language`: Language classification
    - `status`: Current or defunct
 
-3. **Data Cleaning**: 
+3. **Data Cleaning**:
    - Removed Wikipedia citation markers `[1]`, `[2]`, etc.
    - Cleaned special characters and formatting artifacts
    - Normalized whitespace and text formatting
@@ -57,7 +57,7 @@ The Wikipedia source is organized into sections by language, with both current a
    - Common domain patterns (.ch, .li domains)
    - Publisher information and outlet names
 
-3. **Validation Strategy**: 
+3. **Validation Strategy**:
    - Manually curated known URLs for reliability
    - Focused on established, reputable news sources
    - Ensured URLs point to actual news websites (not RSS feeds)
@@ -70,7 +70,7 @@ The Wikipedia source is organized into sections by language, with both current a
    news_website,url,original_language,owner,city,canton,occurrence
    ```
 
-2. **Quality Filtering**: 
+2. **Quality Filtering**:
    - Included only current outlets with validated URLs
    - Sorted by language then alphabetically for organization
    - Ensured all entries have accessible website URLs
@@ -183,6 +183,6 @@ The systematic approach ensured data quality and completeness while the modular 
 
 ---
 
-**Research completed**: August 4, 2025  
-**Database version**: 1.0  
+**Research completed**: August 4, 2025
+**Database version**: 1.0
 **Next update recommended**: September 2025
