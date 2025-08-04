@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: swissnews
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  weaviate:
+    image: semitechnologies/weaviate:1.22.4
+    ports:
+      - "8080:8080"
+    environment:
+      QUERY_DEFAULTS_LIMIT: 25
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
+      DEFAULT_VECTORIZER_MODULE: 'none'
+      ENABLE_MODULES: ''
+      CLUSTER_HOSTNAME: 'node1'
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://user:password@postgres:5432/swissnews
+      REDIS_URL: redis://redis:6379/0
+      WEAVIATE_URL: http://weaviate:8080
+    depends_on:
+      - postgres
+      - redis
+      - weaviate
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    depends_on:
+      - backend
+
+  scraper:
+    build: ./backend
+    command: python -m scraper.main
+    environment:
+      DATABASE_URL: postgresql://user:password@postgres:5432/swissnews
+      REDIS_URL: redis://redis:6379/0
+      WEAVIATE_URL: http://weaviate:8080
+    depends_on:
+      - postgres
+      - redis
+      - weaviate
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+
+volumes:
+  postgres_data:
+  redis_data:
+  weaviate_data:
