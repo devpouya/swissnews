@@ -17,6 +17,9 @@ help:
 	@echo "  lint               - Run linting (flake8, eslint)"
 	@echo "  type-check         - Run type checking (mypy, tsc)"
 	@echo "  quality-check      - Run all quality checks"
+	@echo "  install-hooks      - Install pre-commit hooks"
+	@echo "  run-hooks          - Run pre-commit hooks on all files"
+	@echo "  update-hooks       - Update pre-commit hook versions"
 	@echo "  docker-up          - Start all services with Docker"
 	@echo "  docker-down        - Stop all Docker services"
 	@echo "  clean              - Clean build artifacts"
@@ -82,6 +85,25 @@ type-check:
 
 quality-check: format lint type-check
 	@echo "All quality checks completed!"
+
+# Pre-commit hooks
+install-hooks:
+	@echo "Installing pre-commit hooks..."
+	pip install pre-commit
+	pre-commit install
+	pre-commit install --hook-type commit-msg
+
+update-hooks:
+	@echo "Updating pre-commit hooks..."
+	pre-commit autoupdate
+
+run-hooks:
+	@echo "Running pre-commit hooks on all files..."
+	pre-commit run --all-files
+
+check-hooks:
+	@echo "Checking pre-commit hook configuration..."
+	pre-commit validate-config
 
 docker-up:
 	docker-compose up -d
