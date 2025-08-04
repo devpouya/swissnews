@@ -470,3 +470,472 @@ def log_scraping_stats(stats: Dict[str, Any]) -> None:
         f"{errors} errors, "
         f"duration: {duration:.2f}s"
     )
+
+
+# Advanced Content Extraction Utilities for Issue #4
+
+
+def advanced_clean_text(text: str, language: str = "de", outlet_config: Optional[Dict] = None) -> str:
+    """
+    Advanced text cleaning with language-specific and outlet-specific processing.
+    
+    Args:
+        text: Text to clean
+        language: Content language (de, fr, it, rm)
+        outlet_config: Optional outlet-specific configuration
+        
+    Returns:
+        Cleaned and normalized text
+    """
+    if not text:
+        return ""
+    
+    # Start with basic cleaning
+    text = clean_text(text)
+    
+    # Language-specific ad removal
+    text = remove_ad_content(text, language)
+    
+    # Remove outlet-specific patterns if config provided
+    if outlet_config and "text_processing" in outlet_config:
+        remove_patterns = outlet_config["text_processing"].get("remove_patterns", [])
+        for pattern in remove_patterns:
+            text = re.sub(pattern, "", text, flags=re.IGNORECASE)
+    
+    # Advanced HTML artifact cleaning
+    text = clean_html_artifacts(text)
+    
+    # Handle special characters based on language
+    text = handle_special_characters(text, language)
+    
+    return text.strip()
+
+
+def remove_ad_content(text: str, language: str) -> str:
+    """
+    Remove advertisement content based on language-specific patterns.
+    
+    Args:
+        text: Text to clean
+        language: Content language
+        
+    Returns:
+        Text with ad content removed
+    """
+    if not text:
+        return ""
+    
+    ad_patterns = {
+        "de": [
+            r"\[Werbung\]",
+            r"\(Anzeige\)",
+            r"\(Werbung\)",
+            r"Anzeige\s*:",
+            r"Sponsored\s*:",
+            r"Partner-Inhalte?",
+            r"Werbliche\s+Inhalte?"
+        ],
+        "fr": [
+            r"\[Publicité\]",
+            r"\(Publicité\)",
+            r"Publicité\s*:",
+            r"Contenu\s+sponsorisé",
+            r"Partenaire\s*:",
+            r"Sponsored\s*:"
+        ],
+        "it": [
+            r"\[Pubblicità\]",
+            r"\(Pubblicità\)",
+            r"Pubblicità\s*:",
+            r"Contenuto\s+sponsorizzato",
+            r"Partner\s*:",
+            r"Sponsored\s*:"
+        ]
+    }
+    
+    patterns = ad_patterns.get(language, ad_patterns["de"])
+    
+    for pattern in patterns:
+        text = re.sub(pattern, "", text, flags=re.IGNORECASE)
+    
+    return text
+
+
+def clean_html_artifacts(text: str) -> str:
+    """
+    Remove HTML artifacts and encoding issues.
+    
+    Args:
+        text: Text to clean
+        
+    Returns:
+        Text with HTML artifacts removed
+    """
+    if not text:
+        return ""
+    
+    # Extended HTML entity handling
+    html_entities = {
+        "&nbsp;": " ",
+        "&amp;": "&",
+        "&lt;": "<",
+        "&gt;": ">",
+        "&quot;": '"',
+        "&apos;": "'",
+        "&#39;": "'",
+        "&hellip;": "...",
+        "&mdash;": "—",
+        "&ndash;": "–",
+        "&laquo;": "«",
+        "&raquo;": "»",
+        "&ldquo;": """,
+        "&rdquo;": """,
+        "&lsquo;": "'",
+        "&rsquo;": "'",
+    }
+    
+    for entity, replacement in html_entities.items():
+        text = text.replace(entity, replacement)
+    
+    # Remove remaining HTML entities
+    text = re.sub(r"&[a-zA-Z][a-zA-Z0-9]*;", " ", text)
+    text = re.sub(r"&#\d+;", " ", text)
+    text = re.sub(r"&#x[0-9a-fA-F]+;", " ", text)
+    
+    # Remove HTML tags if any remain
+    text = re.sub(r"<[^>]+>", " ", text)
+    
+    # Clean up whitespace
+    text = re.sub(r"\s+", " ", text)
+    
+    return text.strip()
+
+
+def handle_special_characters(text: str, language: str) -> str:
+    """
+    Handle special characters specific to Swiss languages.
+    
+    Args:
+        text: Text to process
+        language: Language code
+        
+    Returns:
+        Text with properly handled special characters
+    """
+    if not text:
+        return ""
+    
+    # Swiss German specific handling
+    if language == "de":
+        # Normalize umlauts (keep them, don't convert to ae/oe/ue)
+        pass  # Keep original Swiss German characters
+    
+    # French specific handling
+    elif language == "fr":
+        # Ensure proper French accents are preserved
+        pass  # Keep French accents
+    
+    # Italian specific handling  
+    elif language == "it":
+        # Ensure proper Italian accents are preserved
+        pass  # Keep Italian accents
+    
+    # Remove problematic characters that might cause encoding issues
+    text = re.sub(r"[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]", "", text)
+    
+    return text
+
+
+def preserve_article_structure(elements_text: List[str]) -> str:
+    """
+    Preserve article structure when combining text elements.
+    
+    Args:
+        elements_text: List of text elements to combine
+        
+    Returns:
+        Combined text with preserved structure
+    """
+    if not elements_text:
+        return ""
+    
+    # Clean individual elements
+    cleaned_elements = []
+    for element in elements_text:
+        cleaned = advanced_clean_text(element)
+        if cleaned and len(cleaned.strip()) > 10:  # Skip very short elements
+            cleaned_elements.append(cleaned)
+    
+    # Join with double newlines to preserve paragraph structure
+    return "\n\n".join(cleaned_elements)
+
+
+def extract_and_clean_quotes(text: str) -> List[str]:
+    """
+    Extract and clean quotes from text content.
+    
+    Args:
+        text: Text to extract quotes from
+        
+    Returns:
+        List of cleaned quotes
+    """
+    if not text:
+        return []
+    
+    quotes = []
+    
+    # Pattern for quoted text (various quote styles)
+    quote_patterns = [
+        r'"([^"]{20,})"',      # Double quotes
+        r"'([^']{20,})'",      # Single quotes  
+        r"«([^»]{20,})»",      # French quotes
+        r'"([^"]{20,})"',      # Curly double quotes
+        r"'([^']{20,})'",      # Curly single quotes
+    ]
+    
+    for pattern in quote_patterns:
+        matches = re.findall(pattern, text)
+        for match in matches:
+            cleaned_quote = advanced_clean_text(match)
+            if cleaned_quote and len(cleaned_quote) > 20:
+                quotes.append(cleaned_quote)
+    
+    # Remove duplicates while preserving order
+    seen = set()
+    unique_quotes = []
+    for quote in quotes:
+        if quote not in seen:
+            seen.add(quote)
+            unique_quotes.append(quote)
+    
+    return unique_quotes
+
+
+def validate_article_content(content: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Validate extracted article content for completeness and quality.
+    
+    Args:
+        content: Article content dictionary
+        
+    Returns:
+        Validation result with score and issues
+    """
+    validation = {
+        "is_valid": True,
+        "score": 0.0,
+        "issues": [],
+        "completeness": 0.0
+    }
+    
+    required_fields = ["title", "body_paragraphs", "url"]
+    optional_fields = ["author", "publication_date", "tags", "images"]
+    
+    # Check required fields
+    missing_required = []
+    for field in required_fields:
+        if not content.get(field):
+            missing_required.append(field)
+    
+    if missing_required:
+        validation["is_valid"] = False
+        validation["issues"].append(f"Missing required fields: {', '.join(missing_required)}")
+    
+    # Calculate completeness score
+    total_fields = len(required_fields) + len(optional_fields)
+    present_fields = 0
+    
+    for field in required_fields + optional_fields:
+        field_value = content.get(field)
+        if field_value:
+            if isinstance(field_value, list) and len(field_value) > 0:
+                present_fields += 1
+            elif isinstance(field_value, str) and field_value.strip():
+                present_fields += 1
+            elif field_value:  # For other types like datetime
+                present_fields += 1
+    
+    validation["completeness"] = present_fields / total_fields
+    
+    # Content quality checks
+    if content.get("body_paragraphs"):
+        paragraphs = content["body_paragraphs"]
+        if len(paragraphs) < 2:
+            validation["issues"].append("Article has very few paragraphs")
+        
+        total_words = sum(len(p.split()) for p in paragraphs)
+        if total_words < 100:
+            validation["issues"].append("Article content is very short")
+            validation["score"] -= 0.2
+        elif total_words > 2000:
+            validation["score"] += 0.1  # Bonus for substantial content
+    
+    # Title quality check
+    if content.get("title"):
+        title_length = len(content["title"])
+        if title_length < 10:
+            validation["issues"].append("Title is very short")
+        elif title_length > 200:
+            validation["issues"].append("Title is unusually long")
+    
+    # Calculate overall score
+    base_score = validation["completeness"]
+    validation["score"] = max(0.0, min(1.0, base_score + validation["score"]))
+    
+    # Final validation
+    if validation["score"] < 0.3:
+        validation["is_valid"] = False
+        validation["issues"].append("Overall content quality is too low")
+    
+    return validation
+
+
+def check_content_completeness(content: str) -> bool:
+    """
+    Check if content appears to be complete and substantial.
+    
+    Args:
+        content: Content text to check
+        
+    Returns:
+        True if content appears complete
+    """
+    if not content:
+        return False
+    
+    word_count = len(content.split())
+    
+    # Basic completeness indicators
+    if word_count < 50:
+        return False
+    
+    # Check for truncation indicators
+    truncation_indicators = [
+        "...", "[mehr]", "[more]", "[suite]", "[continua]",
+        "weiterlesen", "lire la suite", "leggi tutto"
+    ]
+    
+    content_lower = content.lower()
+    for indicator in truncation_indicators:
+        if content_lower.endswith(indicator.lower()):
+            return False
+    
+    # Check for proper sentence structure
+    sentences = re.split(r'[.!?]+', content)
+    complete_sentences = [s.strip() for s in sentences if len(s.strip()) > 10]
+    
+    return len(complete_sentences) >= 3
+
+
+def detect_content_quality(content: str) -> float:
+    """
+    Detect content quality on a scale of 0.0 to 1.0.
+    
+    Args:
+        content: Content text to analyze
+        
+    Returns:
+        Quality score between 0.0 and 1.0
+    """
+    if not content:
+        return 0.0
+    
+    score = 0.0
+    
+    # Length score (up to 0.3)
+    word_count = len(content.split())
+    if word_count > 500:
+        score += 0.3
+    elif word_count > 200:
+        score += 0.2
+    elif word_count > 100:
+        score += 0.1
+    
+    # Sentence structure score (up to 0.3)
+    sentences = re.split(r'[.!?]+', content)
+    complete_sentences = [s.strip() for s in sentences if len(s.strip()) > 10]
+    
+    if len(complete_sentences) > 10:
+        score += 0.3
+    elif len(complete_sentences) > 5:
+        score += 0.2
+    elif len(complete_sentences) > 2:
+        score += 0.1
+    
+    # Language quality indicators (up to 0.2)
+    # Check for proper capitalization
+    if re.search(r'^[A-ZÄÖÜÀÁÂÃÉÊÍÎÓÔÕÚÛ]', content):
+        score += 0.05
+    
+    # Check for varied sentence length
+    if complete_sentences:
+        avg_length = sum(len(s.split()) for s in complete_sentences) / len(complete_sentences)
+        if 10 <= avg_length <= 30:  # Good average sentence length
+            score += 0.05
+    
+    # Content structure indicators (up to 0.2)
+    # Check for paragraphs
+    paragraph_breaks = content.count('\n\n')
+    if paragraph_breaks > 0:
+        score += 0.1
+    
+    # Check for absence of excessive repetition
+    words = content.lower().split()
+    if words:
+        unique_words = len(set(words))
+        word_diversity = unique_words / len(words)
+        if word_diversity > 0.5:
+            score += 0.1
+    
+    return min(1.0, score)
+
+
+def validate_metadata_consistency(metadata: Dict[str, Any]) -> bool:
+    """
+    Validate that extracted metadata is consistent and reasonable.
+    
+    Args:
+        metadata: Metadata dictionary to validate
+        
+    Returns:
+        True if metadata appears consistent
+    """
+    if not metadata:
+        return False
+    
+    # Date consistency check
+    if metadata.get("publication_date"):
+        pub_date = metadata["publication_date"]
+        if isinstance(pub_date, datetime):
+            # Check if date is reasonable (not in future, not too old)
+            now = datetime.now()
+            if pub_date > now:
+                return False
+            # Check if date is not older than 20 years (adjust as needed)
+            if (now - pub_date).days > 20 * 365:
+                return False
+    
+    # Author consistency check
+    if metadata.get("author"):
+        author = metadata["author"]
+        # Basic author name validation
+        if len(author) < 2 or len(author) > 100:
+            return False
+        # Check for reasonable author format
+        if not re.match(r'^[A-Za-zÀ-ÿĀ-žА-я\s\-\.\']+$', author):
+            return False
+    
+    # Tags consistency check
+    if metadata.get("tags"):
+        tags = metadata["tags"]
+        if isinstance(tags, list):
+            # Check for reasonable number of tags
+            if len(tags) > 20:
+                return False
+            # Check individual tags
+            for tag in tags:
+                if len(tag) < 2 or len(tag) > 50:
+                    return False
+    
+    return True

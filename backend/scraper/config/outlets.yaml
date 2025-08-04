@@ -14,6 +14,25 @@ outlets:
       content: ".article__body p, .content__body p"
       author: ".author__name, .byline__author"
       date: ".article__date, .publish-date"
+    content_selectors:
+      main_text: ".article__body p, .content__body p, .article-content p"
+      subtitle: ".article__subtitle, .headline__subtitle, .lead"
+      author: ".author__name, .byline__author, .article__author"
+      date: ".article__date, .publish-date, time[datetime]"
+      tags: ".article__tags a, .topic-tags a, .tags a"
+      categories: ".breadcrumb a, .section-name, .category-link"
+      images: ".article__image img, .content-image img, figure img"
+      image_captions: ".image-caption, .photo-caption, figcaption"
+      quotes: "blockquote, .quote, .pullquote"
+      highlights: ".highlight, .callout, strong"
+    exclusion_selectors:
+      ads: ".advertisement, .ad-container, .sponsored-content"
+      navigation: ".navigation, .breadcrumb, .related-links"
+      social: ".social-share, .share-buttons"
+    text_processing:
+      language: "de"
+      remove_patterns: ["\\[Werbung\\]", "\\(Anzeige\\)", "Anzeige\\s*:"]
+      preserve_formatting: true
     timeouts:
       page_load: 30
       element_wait: 10
@@ -33,6 +52,25 @@ outlets:
       content: ".article-content p, .story-content p"
       author: ".author-name, .byline"
       date: ".article-date, .publication-date"
+    content_selectors:
+      main_text: ".article-content p, .story-content p, .article-body p"
+      subtitle: ".article-subtitle, .story-subtitle, .lead"
+      author: ".author-name, .byline, .article-author"
+      date: ".article-date, .publication-date, time[datetime]"
+      tags: ".article-tags a, .story-tags a, .tags a"
+      categories: ".breadcrumb a, .category, .section-link"
+      images: ".article-image img, .story-image img, figure img"
+      image_captions: ".image-caption, .photo-caption, figcaption"
+      quotes: "blockquote, .quote, .story-quote"
+      highlights: ".highlight, .emphasis, strong"
+    exclusion_selectors:
+      ads: ".advertisement, .ad-banner, .sponsored"
+      navigation: ".navigation, .breadcrumb, .related"
+      social: ".social-buttons, .share-widget"
+    text_processing:
+      language: "de"
+      remove_patterns: ["\\[Werbung\\]", "\\(Anzeige\\)", "Werblicher\\s+Inhalt"]
+      preserve_formatting: true
     timeouts:
       page_load: 25
       element_wait: 8
@@ -69,6 +107,25 @@ outlets:
       content: ".article__content p, .content__text p"
       author: ".article__author, .author-name"
       date: ".article__date, .publication-date"
+    content_selectors:
+      main_text: ".article__content p, .content__text p, .article-body p"
+      subtitle: ".article__subtitle, .chapeau, .lead"
+      author: ".article__author, .author-name, .byline"
+      date: ".article__date, .publication-date, time[datetime]"
+      tags: ".article__tags a, .mots-cles a, .tags a"
+      categories: ".breadcrumb a, .rubrique, .section"
+      images: ".article__image img, .content-image img, figure img"
+      image_captions: ".legende, .caption, figcaption"
+      quotes: "blockquote, .citation, .quote"
+      highlights: ".encadre, .highlight, strong"
+    exclusion_selectors:
+      ads: ".publicite, .ad-container, .sponsored"
+      navigation: ".navigation, .fil-ariane, .related"
+      social: ".partage, .share-buttons"
+    text_processing:
+      language: "fr"
+      remove_patterns: ["\\[Publicité\\]", "\\(Publicité\\)", "Contenu\\s+sponsorisé"]
+      preserve_formatting: true
     timeouts:
       page_load: 30
       element_wait: 10
