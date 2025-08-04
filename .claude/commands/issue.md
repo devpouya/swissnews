@@ -22,11 +22,13 @@ manageable tasks.
 - Commit your changes after each step.
 
 # TEST
-- Use puppeteer via MCP to test the changes if you have made changes to the UI
+- Think hard on what the most useful tests would be, write at most 5 tests.
+- No more than 5 tests.
 - Write rspec tests to describe the expected behavior of your code
 - Run the full test suit to ensure you haven't broken anything
 - If the tests are failing, fix them.
 - Ensure that all tests are passing before moving to the next step
+- Ensure all the tests also pass on CI on github.
 
 # DEPLOY
 - Open a PR and request a review.
