@@ -1,0 +1,31 @@
+news_website,url,original_language,owner,city,canton,occurrence
+24 heures,https://www.24heures.ch,French,TX Group,Lausanne,Canton of Vaud,Daily
+Blick,https://www.blick.ch,French,Ringier,Zurich,Canton of Zurich,Daily
+Journal du Jura,https://www.journaldujura.ch,French,Gassmann AG,Biel/Bienne,Canton of Bern,Daily
+Le Matin,https://www.lematin.ch,French,Edipresse,Lausanne,Canton of Vaud,Daily
+Le Nouvelliste,https://www.lenouvelliste.ch,French,Éditions Le Nouvelliste,Sion,Canton of Valais,Daily
+Le Temps,https://www.letemps.ch,French,Fondation Aventinus,Geneva,Canton of Geneva,Daily
+20 Minuten,https://www.20min.ch,German,TX Group,,,Daily
+Aargauer Zeitung,https://www.aargauerzeitung.ch,German,AZ Medien Gruppe,Aarau,Canton of Aargau,Daily
+Appenzeller Zeitung [de],https://www.appenzellerzeitung.ch,German,CH Media,,Appenzell Ausserrhoden/Appenzell Innerrhoden,Daily
+Basellandschaftliche Zeitung (bz),https://www.bzbasel.ch,German,Luedin,Liestal,Basel-Landschaft,Daily
+Basler Zeitung (BaZ),https://www.bazonline.ch,German,Basler Zeitung Medien,Basel,Basel-Stadt,Daily
+Berner Zeitung,https://www.bernerzeitung.ch,German,Espace Media Groupe/TX Group,Bern,Canton of Bern,Daily
+Bieler Tagblatt,https://www.bielertagblatt.ch,German,Gassmann AG,Biel/Bienne,Canton of Bern,Daily
+Blick,https://www.blick.ch,German,Ringier,Zurich,Canton of Zurich,Daily
+Der Bund,https://www.derbund.ch,German,TX Group,Bern,Canton of Bern,Daily
+Finanz und Wirtschaft [de],https://www.fuw.ch,German,TX Group,Zurich,Canton of Zurich,Weekly
+Freiburger Nachrichten [de],https://www.freiburger-nachrichten.ch,German,Freiburger Nachrichten AG,Fribourg,Canton of Fribourg,Daily
+Handelszeitung,https://www.handelszeitung.ch,German,Axel Springer SE,Zurich,Canton of Zurich,Weekly
+Limmattaler Zeitung,https://www.limmattalerzeitung.ch,German,AZ Medien,Dietikon,Canton of Zurich,Daily
+Luzerner Zeitung,https://www.luzernerzeitung.ch,German,CH Media,Lucerne,Canton of Lucerne,Daily
+Neue Zürcher Zeitung,https://www.nzz.ch,German,NZZ Mediengruppe,Zurich,Canton of Zurich,Daily
+Nidwaldner Zeitung,https://www.nidwaldnerzeitung.ch,German,CH Media,,Canton of Nidwalden,Daily
+St. Galler Tagblatt,https://www.tagblatt.ch,German,St. Galler Tagblatt AG,St. Gallen,Canton of St. Gallen,Daily
+Tages-Anzeiger,https://www.tagesanzeiger.ch,German,TX Group,Zurich,Canton of Zurich,Daily
+Thurgauer Zeitung,https://www.thurgauerzeitung.ch,German,Thurgauer Medien AG,St. Gallen,Canton of St. Gallen,Daily
+Walliser Bote,https://www.walliserbote.ch,German,Mengis Druck & Verlag,Brig,Canton of Valais,Daily
+Zürichsee-Zeitung,https://www.zsz.ch,German,Zürcher Regionalzeitungen AG,Stäfa,Canton of Zurich,Daily
+Corriere del Ticino,https://www.cdt.ch,Italian,Fondazione per il Corriere del Ticino,Muzzano,Canton of Ticino,Daily
+Giornale del Popolo,https://www.gdp.ch,Italian,Nuova Società Editrice del Giornale del Popolo SA,Lugano,Canton of Ticino,Daily
+La Quotidiana,https://www.laquotidiana.ch,Romansch,Somedia,Chur,Canton of the Grisons,Daily
