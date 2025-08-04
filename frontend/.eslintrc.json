@@ -10,5 +10,13 @@
     "prefer-const": "error",
     "no-var": "error"
   },
+  "overrides": [
+    {
+      "files": ["**/__tests__/**/*", "**/*.test.*"],
+      "env": {
+        "jest": true
+      }
+    }
+  ],
   "ignorePatterns": ["node_modules/", ".next/", "out/", "build/"]
 }

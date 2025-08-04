@@ -67,12 +67,18 @@ describe("Next.js Integration", () => {
   it("should handle environment variables", () => {
     // Test environment variable handling
     const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = "test";
+    Object.defineProperty(process.env, "NODE_ENV", {
+      value: "test",
+      writable: true,
+    });
 
     expect(process.env.NODE_ENV).toBe("test");
 
     // Restore
-    process.env.NODE_ENV = originalEnv;
+    Object.defineProperty(process.env, "NODE_ENV", {
+      value: originalEnv,
+      writable: true,
+    });
   });
 });
 
