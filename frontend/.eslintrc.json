@@ -1,0 +1,14 @@
+{
+  "extends": ["eslint:recommended", "next/core-web-vitals"],
+  "root": true,
+  "env": {
+    "node": true,
+    "es6": true
+  },
+  "rules": {
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "prefer-const": "error",
+    "no-var": "error"
+  },
+  "ignorePatterns": ["node_modules/", ".next/", "out/", "build/"]
+}

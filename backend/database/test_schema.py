@@ -84,7 +84,7 @@ def analyze_schema_structure(sql_file_path: str) -> Dict[str, Any]:
     with open(sql_file_path, "r", encoding="utf-8") as file:
         content = file.read()
 
-    analysis = {
+    analysis: Dict[str, List[str]] = {
         "tables": [],
         "indexes": [],
         "views": [],
@@ -287,7 +287,7 @@ def run_all_tests() -> bool:
     logger.info("Analyzing schema structure...")
     try:
         analysis = analyze_schema_structure(migration_file)
-        logger.info(f"Schema Analysis:")
+        logger.info("Schema Analysis:")
         logger.info(f"  Tables: {analysis['tables']}")
         logger.info(f"  Indexes: {len(analysis['indexes'])} total")
         logger.info(f"  Views: {analysis['views']}")
@@ -317,7 +317,7 @@ def run_all_tests() -> bool:
         return False
 
 
-def main():
+def main() -> None:
     """Main function"""
 
     if len(sys.argv) > 1 and sys.argv[1] == "--verbose":

@@ -8,7 +8,7 @@ This issue is part of the core Swiss News Aggregator project requirements as out
 
 ### Requirements Analysis
 - Extract news outlets from Wikipedia lists across 4 languages
-- Find actual website URLs (not RSS feeds) 
+- Find actual website URLs (not RSS feeds)
 - Create CSV with specific schema: `news_website,url,original_language,owner,city,canton,occurrence`
 - Validate URLs are accessible
 - Minimum 20+ outlets
@@ -16,7 +16,7 @@ This issue is part of the core Swiss News Aggregator project requirements as out
 
 ### Wikipedia Sources to Scrape
 1. **German**: https://en.wikipedia.org/wiki/List_of_newspapers_in_Switzerland#German_language
-2. **French**: https://en.wikipedia.org/wiki/List_of_newspapers_in_Switzerland#French_language  
+2. **French**: https://en.wikipedia.org/wiki/List_of_newspapers_in_Switzerland#French_language
 3. **Italian**: https://en.wikipedia.org/wiki/List_of_newspapers_in_Switzerland#Italian_language
 4. **Romansch**: https://en.wikipedia.org/wiki/List_of_newspapers_in_Switzerland#Romansch_language
 
@@ -38,7 +38,7 @@ Le Temps,https://www.letemps.ch,French,Groupe Tamedia,Geneva,Geneva,daily
 ### 3. Implementation Plan
 1. **Setup**: Create scraper script in `backend/scraper/wikipedia_scraper.py`
 2. **Scraping**: Extract data from each Wikipedia section
-3. **URL Research**: Find actual websites (manual + automated validation)  
+3. **URL Research**: Find actual websites (manual + automated validation)
 4. **Data Compilation**: Merge into single CSV with proper schema
 5. **Validation**: Check URL accessibility and data completeness
 6. **Documentation**: Create research methodology docs
@@ -54,7 +54,7 @@ Le Temps,https://www.letemps.ch,French,Groupe Tamedia,Geneva,Geneva,daily
 - [x] All 4 language categories covered
 - [x] Minimum 20 major Swiss outlets included
 - [x] All URLs validated and accessible
-- [x] CSV follows exact specified schema  
+- [x] CSV follows exact specified schema
 - [x] Comprehensive documentation provided
 
 ## Implementation Steps
@@ -65,7 +65,7 @@ Le Temps,https://www.letemps.ch,French,Groupe Tamedia,Geneva,Geneva,daily
 3. Create basic Wikipedia scraper
 4. Extract German language outlets first (largest category)
 
-### Phase 2: Multi-language Extraction  
+### Phase 2: Multi-language Extraction
 5. Extend scraper for French outlets
 6. Add Italian outlets extraction
 7. Add Romansch outlets extraction
@@ -103,7 +103,7 @@ Le Temps,https://www.letemps.ch,French,Groupe Tamedia,Geneva,Geneva,daily
 - Manual research required for missing website URLs
 - Rate limiting considerations for URL validation
 
-### Mitigation Strategies  
+### Mitigation Strategies
 - Robust HTML parsing with fallback methods
 - Manual research phase for missing URLs
 - Respectful scraping with delays
@@ -112,7 +112,7 @@ Le Temps,https://www.letemps.ch,French,Groupe Tamedia,Geneva,Geneva,daily
 
 ## Timeline Estimate
 - Phase 1-2: Wikipedia scraping (2-3 hours)
-- Phase 3: URL research and validation (3-4 hours) 
+- Phase 3: URL research and validation (3-4 hours)
 - Phase 4: Data compilation (1 hour)
 - Phase 5: Testing and docs (2 hours)
 - Phase 6: Review and delivery (1 hour)

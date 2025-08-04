@@ -76,7 +76,7 @@ class SwissNewsURLResearcher:
         current_outlets = [o for o in self.outlets if o.status == "current"]
         logger.info(f"Current outlets: {len(current_outlets)}")
 
-        lang_breakdown = {}
+        lang_breakdown: Dict[str, int] = {}
         for outlet in current_outlets:
             lang_breakdown[outlet.language] = lang_breakdown.get(outlet.language, 0) + 1
 
@@ -222,7 +222,7 @@ class SwissNewsURLResearcher:
         found_count = 0
 
         for i, outlet in enumerate(current_outlets):
-            logger.info(f"Progress: {i+1}/{len(current_outlets)}")
+            logger.info(f"Progress: {i + 1}/{len(current_outlets)}")
 
             if self.research_outlet_url(outlet):
                 found_count += 1
@@ -232,7 +232,7 @@ class SwissNewsURLResearcher:
 
             # Progress checkpoint every 10 outlets
             if (i + 1) % 10 == 0:
-                logger.info(f"Checkpoint: Found URLs for {found_count}/{i+1} outlets")
+                logger.info(f"Checkpoint: Found URLs for {found_count}/{i + 1} outlets")
 
         logger.info(
             f"🎯 URL research completed: {found_count}/{len(current_outlets)} URLs found"
@@ -280,26 +280,26 @@ class SwissNewsURLResearcher:
         current_outlets = [o for o in self.outlets if o.status == "current"]
         found_urls = [o for o in current_outlets if o.url_status == "found"]
 
-        print(f"\n=== URL RESEARCH SUMMARY ===")
+        print("\n=== URL RESEARCH SUMMARY ===")
         print(f"Total current outlets: {len(current_outlets)}")
         print(f"URLs found: {len(found_urls)}")
-        print(f"Success rate: {len(found_urls)/len(current_outlets)*100:.1f}%")
+        print(f"Success rate: {len(found_urls) / len(current_outlets) * 100:.1f}%")
 
-        print(f"\nBy language:")
+        print("\nBy language:")
         for lang in ["German", "French", "Italian", "Romansch"]:
             lang_outlets = [o for o in current_outlets if o.language == lang]
             lang_found = [o for o in lang_outlets if o.url_status == "found"]
             if lang_outlets:
                 print(
-                    f"  {lang}: {len(lang_found)}/{len(lang_outlets)} ({len(lang_found)/len(lang_outlets)*100:.1f}%)"
+                    f"  {lang}: {len(lang_found)}/{len(lang_outlets)} ({len(lang_found) / len(lang_outlets) * 100:.1f}%)"
                 )
 
-        print(f"\nSample found URLs:")
+        print("\nSample found URLs:")
         for outlet in found_urls[:10]:
             print(f"  {outlet.name}: {outlet.url}")
 
 
-def main():
+def main() -> int:
     """Main execution function."""
     input_file = "../../data/raw/swiss_news_outlets_raw.csv"
     output_file = "../../data/processed/swiss_news_outlets_with_urls.csv"
@@ -319,9 +319,9 @@ def main():
         # Print summary
         researcher.print_summary()
 
-        print(f"\n✅ URL research completed!")
+        print("\n✅ URL research completed!")
         print(f"📁 Results saved to: {output_file}")
-        print(f"📊 Next step: Create final swiss_news_outlets.csv with proper schema")
+        print("📊 Next step: Create final swiss_news_outlets.csv with proper schema")
 
     except Exception as e:
         logger.error(f"URL research failed: {e}")

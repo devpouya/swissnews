@@ -1,7 +1,7 @@
 [run]
 source = backend
 branch = True
-omit = 
+omit =
     */tests/*
     */venv/*
     */.venv/*

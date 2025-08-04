@@ -189,7 +189,7 @@ def verify_data_integrity() -> bool:
             logger.warning("Fewer than 10 outlets found - this seems low")
 
         # Check language distribution
-        language_counts = {}
+        language_counts: Dict[str, int] = {}
         for outlet in all_outlets:
             lang = outlet["language"]
             language_counts[lang] = language_counts.get(lang, 0) + 1
@@ -223,7 +223,7 @@ def verify_data_integrity() -> bool:
         return False
 
 
-def main():
+def main() -> None:
     """Main function"""
 
     parser = argparse.ArgumentParser(description="Populate outlets table from CSV data")

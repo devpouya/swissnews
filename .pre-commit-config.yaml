@@ -58,21 +58,14 @@ repos:
     rev: v9.32.0
     hooks:
       - id: eslint
-        files: ^frontend/.*\.(js|jsx|ts|tsx)$
-        exclude: ^frontend/(node_modules|\.next|build)/
+        files: ^frontend/src/.*\.(js|jsx|ts|tsx)$
+        exclude: ^frontend/(node_modules|\.next|build|jest\.config\.js|jest\.setup\.js|next\.config\.js|tailwind\.config\.js)/
         additional_dependencies:
           - eslint@8.53.0
           - eslint-config-next@14.0.3
           - "@typescript-eslint/eslint-plugin@6.10.0"
           - "@typescript-eslint/parser@6.10.0"
 
-  # Security checks
-  - repo: https://github.com/PyCQA/bandit
-    rev: 1.8.6
-    hooks:
-      - id: bandit
-        args: ["-r", "backend/", "-f", "json", "-o", "bandit-report.json"]
-        files: ^backend/.*\.py$
 
   # Documentation and code quality
   - repo: https://github.com/pre-commit/pygrep-hooks

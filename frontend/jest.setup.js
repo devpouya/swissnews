@@ -3,7 +3,7 @@
 
 // Used for __tests__/testing-library.js
 // Learn more: https://github.com/testing-library/jest-dom
-import '@testing-library/jest-dom'
+import "@testing-library/jest-dom";
 
 // Global test setup
 beforeAll(() => {
@@ -11,34 +11,34 @@ beforeAll(() => {
   global.IntersectionObserver = class IntersectionObserver {
     constructor() {}
     observe() {
-      return null
+      return null;
     }
     disconnect() {
-      return null
+      return null;
     }
     unobserve() {
-      return null
+      return null;
     }
-  }
+  };
 
   // Mock ResizeObserver
   global.ResizeObserver = class ResizeObserver {
     constructor() {}
     observe() {
-      return null
+      return null;
     }
     disconnect() {
-      return null
+      return null;
     }
     unobserve() {
-      return null
+      return null;
     }
-  }
+  };
 
   // Mock window.matchMedia
-  Object.defineProperty(window, 'matchMedia', {
+  Object.defineProperty(window, "matchMedia", {
     writable: true,
-    value: jest.fn().mockImplementation(query => ({
+    value: jest.fn().mockImplementation((query) => ({
       matches: false,
       media: query,
       onchange: null,
@@ -48,17 +48,17 @@ beforeAll(() => {
       removeEventListener: jest.fn(),
       dispatchEvent: jest.fn(),
     })),
-  })
-})
+  });
+});
 
 // Mock next/router
-jest.mock('next/router', () => ({
+jest.mock("next/router", () => ({
   useRouter() {
     return {
-      route: '/',
-      pathname: '/',
+      route: "/",
+      pathname: "/",
       query: {},
-      asPath: '/',
+      asPath: "/",
       push: jest.fn(),
       pop: jest.fn(),
       reload: jest.fn(),
@@ -71,13 +71,13 @@ jest.mock('next/router', () => ({
         emit: jest.fn(),
       },
       isFallback: false,
-    }
+    };
   },
-}))
+}));
 
 // Mock next/head
-jest.mock('next/head', () => {
+jest.mock("next/head", () => {
   return function Head({ children }) {
-    return <>{children}</>
-  }
-})
+    return <>{children}</>;
+  };
+});

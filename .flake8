@@ -1,7 +1,7 @@
 [flake8]
 max-line-length = 88
 select = E,W,F,C,B,B950
-ignore = 
+ignore =
     # E203: whitespace before ':' (conflicts with black)
     E203,
     # E501: line too long (handled by black)

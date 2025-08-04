@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 class FocusedURLResearcher:
-    def __init__(self):
+    def __init__(self) -> None:
         self.session = requests.Session()
         self.session.headers.update(
             {"User-Agent": "Mozilla/5.0 (Swiss News Research) AppleWebKit/537.36"}
@@ -105,7 +105,7 @@ class FocusedURLResearcher:
 
         return candidates[:5]  # Limit candidates
 
-    def research_urls(self, input_csv: str, output_csv: str):
+    def research_urls(self, input_csv: str, output_csv: str) -> tuple[int, int]:
         """Research URLs for all current outlets."""
         logger.info("Starting URL research for current outlets")
 
@@ -121,7 +121,7 @@ class FocusedURLResearcher:
 
         for i, outlet in enumerate(current_outlets):
             name = outlet["news_website"]
-            logger.info(f"[{i+1}/{len(current_outlets)}] Researching: {name}")
+            logger.info(f"[{i + 1}/{len(current_outlets)}] Researching: {name}")
 
             candidates = self.generate_url_candidates(name)
 
@@ -144,7 +144,7 @@ class FocusedURLResearcher:
 
             # Progress update every 10 outlets
             if (i + 1) % 10 == 0:
-                logger.info(f"Progress: {found_count}/{i+1} URLs found")
+                logger.info(f"Progress: {found_count}/{i + 1} URLs found")
 
         # Save updated results
         logger.info(f"Saving results to {output_csv}")
@@ -178,7 +178,7 @@ if __name__ == "__main__":
     try:
         found, total = researcher.research_urls(input_file, output_file)
         print(
-            f"\n🎯 Results: Found {found}/{total} URLs ({found/total*100:.1f}% success rate)"
+            f"\n🎯 Results: Found {found}/{total} URLs ({found / total * 100:.1f}% success rate)"
         )
         print(f"📁 Updated data saved to: {output_file}")
     except Exception as e:

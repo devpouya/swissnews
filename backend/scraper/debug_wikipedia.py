@@ -7,7 +7,7 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def debug_wikipedia_structure():
+def debug_wikipedia_structure() -> None:
     """Debug the actual structure of the Wikipedia page."""
     url = "https://en.wikipedia.org/wiki/List_of_newspapers_in_Switzerland"
 
@@ -60,7 +60,7 @@ def debug_wikipedia_structure():
                             context_elements.append(f"p: {text}")
 
             if context_elements:
-                print(f"  Preceding context:")
+                print("  Preceding context:")
                 for elem in reversed(
                     context_elements[-3:]
                 ):  # Show last 3 context elements

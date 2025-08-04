@@ -35,7 +35,7 @@ COMMENT ON COLUMN outlets.occurrence IS 'Publication frequency (Daily, Weekly, M
 COMMENT ON COLUMN outlets.status IS 'Current operational status of the outlet';
 
 -- =====================================================
--- ARTICLES TABLE  
+-- ARTICLES TABLE
 -- =====================================================
 -- Stores scraped articles and their metadata
 CREATE TABLE articles (
@@ -86,9 +86,9 @@ CREATE INDEX idx_articles_publish_date ON articles(publish_date DESC NULLS LAST)
 CREATE INDEX idx_articles_outlet_scraped ON articles(outlet_id, scraped_at DESC);
 
 -- Partial indexes for better performance
-CREATE INDEX idx_articles_recent ON articles(publish_date DESC) 
+CREATE INDEX idx_articles_recent ON articles(publish_date DESC)
     WHERE publish_date > CURRENT_DATE - INTERVAL '90 days';
-CREATE INDEX idx_articles_paywalled ON articles(outlet_id, publish_date DESC) 
+CREATE INDEX idx_articles_paywalled ON articles(outlet_id, publish_date DESC)
     WHERE is_paywalled = TRUE;
 
 -- Full-text search indexes
@@ -112,15 +112,15 @@ END;
 $$ language 'plpgsql';
 
 -- Trigger for outlets table
-CREATE TRIGGER update_outlets_updated_at 
-    BEFORE UPDATE ON outlets 
-    FOR EACH ROW 
+CREATE TRIGGER update_outlets_updated_at
+    BEFORE UPDATE ON outlets
+    FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
 -- Trigger for articles table
-CREATE TRIGGER update_articles_updated_at 
-    BEFORE UPDATE ON articles 
-    FOR EACH ROW 
+CREATE TRIGGER update_articles_updated_at
+    BEFORE UPDATE ON articles
+    FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
 -- =====================================================
@@ -128,17 +128,17 @@ CREATE TRIGGER update_articles_updated_at
 -- =====================================================
 
 -- Ensure URLs are properly formatted
-ALTER TABLE outlets ADD CONSTRAINT outlets_url_format 
+ALTER TABLE outlets ADD CONSTRAINT outlets_url_format
     CHECK (url IS NULL OR url ~ '^https?://');
 
-ALTER TABLE articles ADD CONSTRAINT articles_url_format 
+ALTER TABLE articles ADD CONSTRAINT articles_url_format
     CHECK (url ~ '^https?://');
 
 -- Ensure reasonable date ranges
-ALTER TABLE articles ADD CONSTRAINT articles_publish_date_reasonable 
+ALTER TABLE articles ADD CONSTRAINT articles_publish_date_reasonable
     CHECK (publish_date IS NULL OR publish_date <= CURRENT_TIMESTAMP);
 
-ALTER TABLE articles ADD CONSTRAINT articles_scraped_at_reasonable 
+ALTER TABLE articles ADD CONSTRAINT articles_scraped_at_reasonable
     CHECK (scraped_at <= CURRENT_TIMESTAMP);
 
 -- =====================================================
@@ -164,7 +164,7 @@ INSERT INTO articles (url, title, content, summary, author, publish_date, langua
 
 -- View for articles with outlet information
 CREATE VIEW articles_with_outlets AS
-SELECT 
+SELECT
     a.id,
     a.url,
     a.title,
@@ -197,7 +197,7 @@ COMMENT ON VIEW recent_articles IS 'Articles published in the last 30 days with 
 
 -- View for outlet statistics
 CREATE VIEW outlet_stats AS
-SELECT 
+SELECT
     o.id,
     o.name,
     o.language,
@@ -227,7 +227,7 @@ CREATE TABLE schema_migrations (
     description TEXT
 );
 
-INSERT INTO schema_migrations (version, description) VALUES 
+INSERT INTO schema_migrations (version, description) VALUES
 ('001', 'Initial schema with outlets and articles tables');
 
 -- =====================================================

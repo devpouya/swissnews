@@ -2,7 +2,7 @@ Please analyze and fix the Github issue: $ARGUMENTS.
 
 Follow these steps:
 
-# PLAN 
+# PLAN
 1. Use 'gh issue view' to get the issue details
 2. Understand the problem described in the issue
 3. Ask clarifying questions if necessary
@@ -14,21 +14,21 @@ Follow these steps:
 manageable tasks.
 6. Document your plan in a new scratchpad
     - include the issue name in the filename
-    - include a link to the issue in the scratchpad. 
+    - include a link to the issue in the scratchpad.
 
-# CREATE 
+# CREATE
 - Create a new branch for the issue
-- Solve the issue in small, manageable steps, according to your plan. 
-- Commit your changes after each step. 
+- Solve the issue in small, manageable steps, according to your plan.
+- Commit your changes after each step.
 
-# TEST 
-- Use puppeteer via MCP to test the changes if you have made changes to the UI 
-- Write rspec tests to describe the expected behavior of your code 
+# TEST
+- Use puppeteer via MCP to test the changes if you have made changes to the UI
+- Write rspec tests to describe the expected behavior of your code
 - Run the full test suit to ensure you haven't broken anything
 - If the tests are failing, fix them.
 - Ensure that all tests are passing before moving to the next step
 
 # DEPLOY
-- Open a PR and request a review. 
+- Open a PR and request a review.
 
-Remember to use the Githun CLI ('gh') for all Github-related tasks. 
+Remember to use the Githun CLI ('gh') for all Github-related tasks.

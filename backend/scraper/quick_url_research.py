@@ -17,7 +17,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def quick_url_research():
+def quick_url_research() -> tuple[int, int]:
     """Research URLs for major Swiss outlets quickly."""
 
     # Major Swiss outlets with their known URLs
@@ -114,20 +114,20 @@ def quick_url_research():
     )
 
     # Show summary by language
-    print(f"\n=== QUICK URL RESEARCH SUMMARY ===")
+    print("\n=== QUICK URL RESEARCH SUMMARY ===")
     print(f"Total current outlets: {len(current_outlets)}")
     print(f"URLs found: {found_count}")
-    print(f"Success rate: {found_count/len(current_outlets)*100:.1f}%")
+    print(f"Success rate: {found_count / len(current_outlets) * 100:.1f}%")
 
     # Show found URLs by language
-    print(f"\nFound URLs by language:")
+    print("\nFound URLs by language:")
     for lang in ["German", "French", "Italian", "Romansch"]:
         lang_outlets = [o for o in current_outlets if o["original_language"] == lang]
         lang_found = [o for o in lang_outlets if o["url"]]
         if lang_outlets:
             print(f"  {lang}: {len(lang_found)}/{len(lang_outlets)} outlets")
 
-    print(f"\nSample found outlets:")
+    print("\nSample found outlets:")
     found_outlets = [o for o in current_outlets if o["url"]][:10]
     for outlet in found_outlets:
         print(f"  {outlet['news_website']}: {outlet['url']}")

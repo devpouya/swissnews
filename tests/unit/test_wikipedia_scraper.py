@@ -19,23 +19,23 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../backend/scrape
 from wikipedia_scraper import SwissNewsWikipediaScraper
 
 class TestSwissNewsWikipediaScraper(unittest.TestCase):
-    
+
     def setUp(self):
         """Set up test fixtures."""
         self.scraper = SwissNewsWikipediaScraper()
-        
+
     def test_clean_text(self):
         """Test text cleaning functionality."""
         # Test citation removal
         text_with_citations = "Neue Zürcher Zeitung[1][2]"
         cleaned = self.scraper.clean_text(text_with_citations)
         self.assertEqual(cleaned, "Neue Zürcher Zeitung")
-        
+
         # Test whitespace normalization
         text_with_spaces = "  Multiple   spaces  "
         cleaned = self.scraper.clean_text(text_with_spaces)
         self.assertEqual(cleaned, "Multiple spaces")
-        
+
         # Test special character removal
         text_with_symbols = "Outlet†‡"
         cleaned = self.scraper.clean_text(text_with_symbols)
@@ -62,12 +62,12 @@ class TestSwissNewsWikipediaScraper(unittest.TestCase):
             </tr>
         </table>
         """
-        
+
         soup = BeautifulSoup(html_table, 'html.parser')
         table = soup.find('table')
-        
+
         outlets = self.scraper.parse_table(table, 'German')
-        
+
         self.assertEqual(len(outlets), 1)
         outlet = outlets[0]
         self.assertEqual(outlet['news_website'], 'Test Zeitung')
@@ -82,7 +82,7 @@ class TestSwissNewsWikipediaScraper(unittest.TestCase):
         html_table = "<table class='wikitable'></table>"
         soup = BeautifulSoup(html_table, 'html.parser')
         table = soup.find('table')
-        
+
         outlets = self.scraper.parse_table(table, 'German')
         self.assertEqual(len(outlets), 0)
 
@@ -100,12 +100,12 @@ class TestSwissNewsWikipediaScraper(unittest.TestCase):
             </tr>
         </table>
         """
-        
+
         soup = BeautifulSoup(html_table, 'html.parser')
         table = soup.find('table')
-        
+
         outlets = self.scraper.parse_table(table, 'French')
-        
+
         self.assertEqual(len(outlets), 1)
         outlet = outlets[0]
         self.assertEqual(outlet['news_website'], 'Test Outlet')
@@ -122,9 +122,9 @@ class TestSwissNewsWikipediaScraper(unittest.TestCase):
         mock_response.content = b"<html><body>Test content</body></html>"
         mock_response.raise_for_status.return_value = None
         mock_get.return_value = mock_response
-        
+
         soup = self.scraper.fetch_page()
-        
+
         self.assertIsInstance(soup, BeautifulSoup)
         mock_get.assert_called_once()
 
@@ -132,7 +132,7 @@ class TestSwissNewsWikipediaScraper(unittest.TestCase):
     def test_fetch_page_failure(self, mock_get):
         """Test page fetching failure."""
         mock_get.side_effect = Exception("Network error")
-        
+
         with self.assertRaises(Exception):
             self.scraper.fetch_page()
 
@@ -161,31 +161,31 @@ class TestSwissNewsWikipediaScraper(unittest.TestCase):
                 'status': 'current'
             }
         ]
-        
+
         # Create temporary file
         with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.csv') as temp_file:
             temp_filename = temp_file.name
-        
+
         try:
             # Save to CSV
             self.scraper.save_to_csv(temp_filename)
-            
+
             # Verify file contents
             with open(temp_filename, 'r', encoding='utf-8') as file:
                 reader = csv.DictReader(file)
                 rows = list(reader)
-                
+
             self.assertEqual(len(rows), 2)
-            
+
             # Check first row
             self.assertEqual(rows[0]['news_website'], 'Test Outlet 1')
             self.assertEqual(rows[0]['url'], 'https://test1.ch')
             self.assertEqual(rows[0]['original_language'], 'German')
-            
+
             # Check second row
             self.assertEqual(rows[1]['news_website'], 'Test Outlet 2')
             self.assertEqual(rows[1]['original_language'], 'French')
-            
+
         finally:
             # Clean up
             os.unlink(temp_filename)
@@ -193,17 +193,17 @@ class TestSwissNewsWikipediaScraper(unittest.TestCase):
     def test_save_to_csv_empty(self):
         """Test CSV saving with no outlets."""
         self.scraper.outlets = []
-        
+
         with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.csv') as temp_file:
             temp_filename = temp_file.name
-        
+
         try:
             # Should not raise exception
             self.scraper.save_to_csv(temp_filename)
-            
+
             # File should exist but be empty (except for header)
             self.assertTrue(os.path.exists(temp_filename))
-            
+
         finally:
             os.unlink(temp_filename)
 
@@ -257,15 +257,15 @@ class TestSwissNewsWikipediaScraper(unittest.TestCase):
             </body>
         </html>
         """
-        
+
         mock_soup = BeautifulSoup(mock_html, 'html.parser')
         mock_fetch_page.return_value = mock_soup
-        
+
         outlets = self.scraper.scrape_all_languages()
-        
+
         # Should have scraped from all tables
         self.assertEqual(len(outlets), 10)
-        
+
         # Check language distribution
         languages = [outlet['original_language'] for outlet in outlets]
         self.assertIn('German', languages)
@@ -273,7 +273,7 @@ class TestSwissNewsWikipediaScraper(unittest.TestCase):
         self.assertIn('Italian', languages)
         self.assertIn('Romansch', languages)
         self.assertIn('Other', languages)
-        
+
         # Check status distribution
         statuses = [outlet['status'] for outlet in outlets]
         self.assertIn('current', statuses)

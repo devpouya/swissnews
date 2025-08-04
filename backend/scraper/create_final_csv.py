@@ -10,6 +10,7 @@ Focuses on current outlets with validated URLs (30+ outlets).
 
 import csv
 import logging
+from typing import Dict
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -17,7 +18,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def create_final_csv():
+def create_final_csv() -> int:
     """Create the final CSV with proper schema and current outlets only."""
 
     input_file = "../../data/processed/swiss_news_outlets_with_urls.csv"
@@ -74,23 +75,23 @@ def create_final_csv():
     logger.info(f"✅ Final CSV created: {output_file}")
 
     # Print summary statistics
-    print(f"\n=== FINAL SWISS NEWS OUTLETS DATABASE ===")
+    print("\n=== FINAL SWISS NEWS OUTLETS DATABASE ===")
     print(f"Total outlets: {len(current_with_urls)}")
-    print(f"All have validated website URLs: ✅")
+    print("All have validated website URLs: ✅")
 
     # Language breakdown
-    lang_counts = {}
+    lang_counts: Dict[str, int] = {}
     for outlet in current_with_urls:
         lang = outlet["original_language"]
         lang_counts[lang] = lang_counts.get(lang, 0) + 1
 
-    print(f"\nBy language:")
+    print("\nBy language:")
     for lang, count in sorted(lang_counts.items()):
         print(f"  {lang}: {count} outlets")
 
-    print(f"\nSample outlets:")
+    print("\nSample outlets:")
     for i, outlet in enumerate(current_with_urls[:10]):
-        print(f"  {i+1:2d}. {outlet['news_website']} ({outlet['original_language']})")
+        print(f"  {i + 1:2d}. {outlet['news_website']} ({outlet['original_language']})")
         print(f"      URL: {outlet['url']}")
         if outlet["city"]:
             print(f"      City: {outlet['city']}")
@@ -98,13 +99,13 @@ def create_final_csv():
     if len(current_with_urls) > 10:
         print(f"  ... and {len(current_with_urls) - 10} more outlets")
 
-    print(f"\n✅ Requirements fulfilled:")
+    print("\n✅ Requirements fulfilled:")
     print(f"   - ✅ Swiss outlets from Wikipedia: {len(current_with_urls)} outlets")
-    print(f"   - ✅ All 4 languages covered: German, French, Italian, Romansch")
-    print(f"   - ✅ Actual website URLs (not RSS feeds): All validated")
+    print("   - ✅ All 4 languages covered: German, French, Italian, Romansch")
+    print("   - ✅ Actual website URLs (not RSS feeds): All validated")
     print(f"   - ✅ Minimum 20+ outlets: {len(current_with_urls)} outlets")
     print(
-        f"   - ✅ Proper CSV schema: news_website,url,original_language,owner,city,canton,occurrence"
+        "   - ✅ Proper CSV schema: news_website,url,original_language,owner,city,canton,occurrence"
     )
 
     return len(current_with_urls)

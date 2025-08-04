@@ -11,12 +11,13 @@ Created: 2025-08-04
 import logging
 import os
 from contextlib import contextmanager
-from typing import Any, Dict, Generator, List, Optional
+from typing import Any, Dict, Generator, List, Optional, Type
 from urllib.parse import urlparse
 
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from sqlalchemy import MetaData, create_engine, text
+from sqlalchemy.engine import Engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import QueuePool
@@ -28,7 +29,7 @@ logger = logging.getLogger(__name__)
 class DatabaseConfig:
     """Database configuration management"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.host = os.getenv("DB_HOST", "localhost")
         self.port = int(os.getenv("DB_PORT", "5432"))
         self.database = os.getenv("DB_NAME", "swissnews")
@@ -76,7 +77,7 @@ class DatabaseManager:
         self.metadata = MetaData()
 
     @property
-    def engine(self):
+    def engine(self) -> Engine:
         """Lazy-loaded SQLAlchemy engine"""
         if self._engine is None:
             self._engine = create_engine(
@@ -95,7 +96,7 @@ class DatabaseManager:
         return self._engine
 
     @property
-    def session_factory(self):
+    def session_factory(self) -> Type[Session]:
         """Lazy-loaded session factory"""
         if self._session_factory is None:
             self._session_factory = sessionmaker(
@@ -157,7 +158,7 @@ class DatabaseManager:
                     )
                 )
                 row = result.fetchone()
-                return row[0] if row else None
+                return str(row[0]) if row else None
         except Exception as e:
             logger.error(f"Failed to get schema version: {e}")
             return None
@@ -229,7 +230,7 @@ class OutletRepository:
                 ),
                 outlet_data,
             )
-            return result.fetchone()[0]
+            return int(result.fetchone()[0])
 
     def update_outlet(self, outlet_id: int, outlet_data: Dict[str, Any]) -> bool:
         """Update an existing outlet"""
@@ -237,7 +238,7 @@ class OutletRepository:
             result = session.execute(
                 text(
                     """
-                UPDATE outlets 
+                UPDATE outlets
                 SET name = :name, url = :url, language = :language, owner = :owner,
                     city = :city, canton = :canton, occurrence = :occurrence, status = :status
                 WHERE id = :id
@@ -245,7 +246,7 @@ class OutletRepository:
                 ),
                 {**outlet_data, "id": outlet_id},
             )
-            return result.rowcount > 0
+            return bool(result.rowcount > 0)
 
 
 class ArticleRepository:
@@ -260,8 +261,8 @@ class ArticleRepository:
             result = session.execute(
                 text(
                     """
-                SELECT * FROM articles_with_outlets 
-                ORDER BY publish_date DESC NULLS LAST, scraped_at DESC 
+                SELECT * FROM articles_with_outlets
+                ORDER BY publish_date DESC NULLS LAST, scraped_at DESC
                 LIMIT :limit
                 """
                 ),
@@ -277,9 +278,9 @@ class ArticleRepository:
             result = session.execute(
                 text(
                     """
-                SELECT * FROM articles 
-                WHERE outlet_id = :outlet_id 
-                ORDER BY publish_date DESC NULLS LAST, scraped_at DESC 
+                SELECT * FROM articles
+                WHERE outlet_id = :outlet_id
+                ORDER BY publish_date DESC NULLS LAST, scraped_at DESC
                 LIMIT :limit
                 """
                 ),
@@ -293,7 +294,7 @@ class ArticleRepository:
             result = session.execute(
                 text(
                     """
-                INSERT INTO articles (url, title, content, summary, author, publish_date, 
+                INSERT INTO articles (url, title, content, summary, author, publish_date,
                                     language, outlet_id, is_paywalled, word_count, tags)
                 VALUES (:url, :title, :content, :summary, :author, :publish_date,
                         :language, :outlet_id, :is_paywalled, :word_count, :tags)
@@ -302,7 +303,7 @@ class ArticleRepository:
                 ),
                 article_data,
             )
-            return result.fetchone()[0]
+            return int(result.fetchone()[0])
 
     def article_exists(self, url: str) -> bool:
         """Check if article with given URL already exists"""
@@ -310,7 +311,7 @@ class ArticleRepository:
             result = session.execute(
                 text("SELECT COUNT(*) FROM articles WHERE url = :url"), {"url": url}
             )
-            return result.fetchone()[0] > 0
+            return bool(result.fetchone()[0] > 0)
 
     def get_outlet_stats(self) -> List[Dict[str, Any]]:
         """Get outlet statistics"""

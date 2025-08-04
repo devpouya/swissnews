@@ -16,7 +16,7 @@ from typing import Dict, List, Optional
 from urllib.parse import urljoin, urlparse
 
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 
 # Configure logging
 logging.basicConfig(
@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 class SwissNewsWikipediaScraper:
-    def __init__(self):
+    def __init__(self) -> None:
         self.base_url = (
             "https://en.wikipedia.org/wiki/List_of_newspapers_in_Switzerland"
         )
@@ -36,7 +36,7 @@ class SwissNewsWikipediaScraper:
                 "User-Agent": "Swiss News Aggregator Research Bot (https://github.com/devpouya/swissnews)"
             }
         )
-        self.outlets = []
+        self.outlets: List[Dict[str, str]] = []
 
     def fetch_page(self) -> BeautifulSoup:
         """Fetch and parse the Wikipedia page."""
@@ -52,9 +52,9 @@ class SwissNewsWikipediaScraper:
             logger.error(f"Failed to fetch Wikipedia page: {e}")
             raise
 
-    def parse_table(self, table, language: str) -> List[Dict]:
+    def parse_table(self, table: Tag, language: str) -> List[Dict[str, str]]:
         """Parse a Wikipedia table to extract outlet information."""
-        outlets = []
+        outlets: List[Dict[str, str]] = []
         rows = table.find_all("tr")
 
         if not rows:
@@ -231,11 +231,11 @@ class SwissNewsWikipediaScraper:
             print("No outlets scraped")
             return
 
-        print(f"\n=== SCRAPING SUMMARY ===")
+        print("\n=== SCRAPING SUMMARY ===")
         print(f"Total outlets: {len(self.outlets)}")
 
         # Language breakdown
-        language_counts = {}
+        language_counts: Dict[str, int] = {}
         for outlet in self.outlets:
             lang = outlet["original_language"]
             language_counts[lang] = language_counts.get(lang, 0) + 1
@@ -246,20 +246,22 @@ class SwissNewsWikipediaScraper:
 
         print("\nSample outlets:")
         for i, outlet in enumerate(self.outlets[:5]):
-            print(f"  {i+1}. {outlet['news_website']} ({outlet['original_language']})")
+            print(
+                f"  {i + 1}. {outlet['news_website']} ({outlet['original_language']})"
+            )
             if outlet["city"]:
                 print(f"     Location: {outlet['city']}")
             if outlet["owner"]:
                 print(f"     Owner: {outlet['owner']}")
 
 
-def main():
+def main() -> int:
     """Main execution function."""
     scraper = SwissNewsWikipediaScraper()
 
     try:
         # Scrape all outlets
-        outlets = scraper.scrape_all_languages()
+        scraper.scrape_all_languages()
 
         # Save to CSV
         output_file = "../../data/raw/swiss_news_outlets_raw.csv"
@@ -268,9 +270,9 @@ def main():
         # Print summary
         scraper.print_summary()
 
-        print(f"\n✅ Scraping completed successfully!")
+        print("\n✅ Scraping completed successfully!")
         print(f"📁 Raw data saved to: {output_file}")
-        print(f"📊 Next step: Research actual website URLs for each outlet")
+        print("📊 Next step: Research actual website URLs for each outlet")
 
     except Exception as e:
         logger.error(f"Scraping failed: {e}")
