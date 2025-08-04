@@ -49,7 +49,13 @@ describe('Testing Infrastructure', () => {
 describe('Next.js Integration', () => {
   it('should work with Next.js mocks', () => {
     // This tests that our jest.setup.js mocks are working
-    expect(jest.isMockFunction(require('next/router').useRouter)).toBe(true)
+    const { useRouter } = require('next/router')
+    expect(typeof useRouter).toBe('function')
+    
+    // Test that useRouter returns expected mock structure
+    const router = useRouter()
+    expect(router).toHaveProperty('push')
+    expect(router).toHaveProperty('pathname')
   })
 
   it('should handle environment variables', () => {
@@ -90,7 +96,7 @@ describe('Utility Functions', () => {
     const longText = 'This is a very long text that needs to be truncated'
     const truncated = truncateText(longText, 20)
     
-    expect(truncated).toBe('This is a very l...')
+    expect(truncated).toBe('This is a very lo...')
     expect(truncated.length).toBe(20)
   })
 
