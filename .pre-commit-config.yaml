@@ -62,7 +62,7 @@ repos:
         exclude: ^frontend/(node_modules|\.next|build|jest\.config\.js|jest\.setup\.js|next\.config\.js|tailwind\.config\.js)/
         additional_dependencies:
           - eslint@8.53.0
-          - eslint-config-next@14.0.3
+          - eslint-config-next@14.2.31
           - "@typescript-eslint/eslint-plugin@6.10.0"
           - "@typescript-eslint/parser@6.10.0"
 

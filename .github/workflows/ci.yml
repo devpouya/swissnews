@@ -70,7 +70,7 @@ jobs:
         DB_PASSWORD: postgres
       run: |
         cd backend
-        pytest tests/unit/ -v --cov=. --cov-report=xml
+        pytest ../tests/unit/ -v --cov=. --cov-report=xml
 
     - name: Run backend integration tests
       env:
@@ -81,7 +81,7 @@ jobs:
         DB_PASSWORD: postgres
       run: |
         cd backend
-        pytest tests/integration/ -v --cov=. --cov-report=xml --cov-append
+        pytest ../tests/integration/ -v --cov=. --cov-report=xml --cov-append
 
     - name: Upload backend coverage reports
       uses: codecov/codecov-action@v3
@@ -321,8 +321,7 @@ jobs:
 
     - name: Run basic performance tests
       run: |
-        cd tests/performance
-        python -m pytest test_performance.py -v
+        python -m pytest tests/performance/test_performance.py -v
 
   # Deployment (only on main branch)
   deploy:
