@@ -19,6 +19,16 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../../backend'))
 from scraper.base import BaseScraper, OutletScraper, ScrapingError
 
 
+class _TestableBaseScraper(BaseScraper):
+    """Concrete implementation of BaseScraper for testing."""
+
+    def scrape_article_list(self):
+        return []
+
+    def scrape_article_content(self, url):
+        return {}
+
+
 class TestBaseScraper:
     """Test cases for the BaseScraper class."""
 
@@ -48,7 +58,7 @@ class TestBaseScraper:
 
     def test_initialization(self, sample_config):
         """Test BaseScraper initialization with configuration."""
-        scraper = BaseScraper(sample_config)
+        scraper = _TestableBaseScraper(sample_config)
 
         assert scraper.outlet_name == "test_outlet"
         assert scraper.base_url == "https://test-outlet.ch"
@@ -66,7 +76,7 @@ class TestBaseScraper:
             "url": "https://minimal.ch"
         }
 
-        scraper = BaseScraper(minimal_config)
+        scraper = _TestableBaseScraper(minimal_config)
 
         assert scraper.outlet_name == "minimal"
         assert scraper.base_url == "https://minimal.ch"
@@ -81,7 +91,7 @@ class TestBaseScraper:
         mock_driver = Mock()
         mock_chrome.return_value = mock_driver
 
-        scraper = BaseScraper(sample_config)
+        scraper = _TestableBaseScraper(sample_config)
         driver = scraper.setup_driver()
 
         assert driver == mock_driver
@@ -94,14 +104,14 @@ class TestBaseScraper:
         """Test WebDriver setup failure."""
         mock_chrome.side_effect = Exception("WebDriver setup failed")
 
-        scraper = BaseScraper(sample_config)
+        scraper = _TestableBaseScraper(sample_config)
 
         with pytest.raises(ScrapingError, match="WebDriver setup failed"):
             scraper.setup_driver()
 
     def test_retry_on_failure_success_on_first_attempt(self, sample_config):
         """Test retry decorator with successful first attempt."""
-        scraper = BaseScraper(sample_config)
+        scraper = _TestableBaseScraper(sample_config)
 
         mock_func = Mock(return_value="success")
         result = scraper.retry_on_failure(mock_func, "arg1", kwarg1="value1")
@@ -111,7 +121,7 @@ class TestBaseScraper:
 
     def test_retry_on_failure_success_after_retries(self, sample_config):
         """Test retry decorator with success after retries."""
-        scraper = BaseScraper(sample_config)
+        scraper = _TestableBaseScraper(sample_config)
 
         mock_func = Mock(side_effect=[TimeoutException(), TimeoutException(), "success"])
 
@@ -123,7 +133,7 @@ class TestBaseScraper:
 
     def test_retry_on_failure_all_attempts_fail(self, sample_config):
         """Test retry decorator when all attempts fail."""
-        scraper = BaseScraper(sample_config)
+        scraper = _TestableBaseScraper(sample_config)
 
         mock_func = Mock(side_effect=TimeoutException("Timeout"))
 
@@ -142,7 +152,7 @@ class TestBaseScraper:
         mock_wait_instance.until.return_value = mock_element
         mock_wait.return_value = mock_wait_instance
 
-        scraper = BaseScraper(sample_config)
+        scraper = _TestableBaseScraper(sample_config)
         scraper.driver = mock_driver
         scraper.wait = mock_wait_instance
 
@@ -159,7 +169,7 @@ class TestBaseScraper:
         mock_wait_instance.until.side_effect = TimeoutException()
         mock_wait.return_value = mock_wait_instance
 
-        scraper = BaseScraper(sample_config)
+        scraper = _TestableBaseScraper(sample_config)
         scraper.driver = mock_driver
         scraper.wait = mock_wait_instance
 
@@ -174,7 +184,7 @@ class TestBaseScraper:
         mock_elements = [Mock(), Mock()]
         mock_driver.find_elements.return_value = mock_elements
 
-        scraper = BaseScraper(sample_config)
+        scraper = _TestableBaseScraper(sample_config)
         scraper.driver = mock_driver
 
         from selenium.webdriver.common.by import By
@@ -187,7 +197,7 @@ class TestBaseScraper:
         mock_driver = Mock()
         mock_driver.find_elements.side_effect = Exception("Find error")
 
-        scraper = BaseScraper(sample_config)
+        scraper = _TestableBaseScraper(sample_config)
         scraper.driver = mock_driver
 
         from selenium.webdriver.common.by import By
@@ -202,7 +212,7 @@ class TestBaseScraper:
         mock_driver.execute_script.return_value = "complete"
         mock_chrome.return_value = mock_driver
 
-        scraper = BaseScraper(sample_config)
+        scraper = _TestableBaseScraper(sample_config)
         scraper.setup_driver()
 
         with patch('scraper.base.WebDriverWait') as mock_wait:
@@ -219,7 +229,7 @@ class TestBaseScraper:
         mock_driver = Mock()
         mock_driver.get.side_effect = Exception("Navigation failed")
 
-        scraper = BaseScraper(sample_config)
+        scraper = _TestableBaseScraper(sample_config)
         scraper.driver = mock_driver
 
         result = scraper.get_page("https://test.com")
@@ -230,7 +240,7 @@ class TestBaseScraper:
         """Test WebDriver cleanup."""
         mock_driver = Mock()
 
-        scraper = BaseScraper(sample_config)
+        scraper = _TestableBaseScraper(sample_config)
         scraper.driver = mock_driver
 
         scraper.cleanup()
@@ -244,7 +254,7 @@ class TestBaseScraper:
         mock_driver = Mock()
         mock_driver.quit.side_effect = Exception("Cleanup failed")
 
-        scraper = BaseScraper(sample_config)
+        scraper = _TestableBaseScraper(sample_config)
         scraper.driver = mock_driver
 
         # Should not raise exception
@@ -255,10 +265,10 @@ class TestBaseScraper:
 
     def test_context_manager(self, sample_config):
         """Test BaseScraper as context manager."""
-        with patch.object(BaseScraper, 'setup_driver') as mock_setup:
-            with patch.object(BaseScraper, 'cleanup') as mock_cleanup:
+        with patch.object(_TestableBaseScraper, 'setup_driver') as mock_setup:
+            with patch.object(_TestableBaseScraper, 'cleanup') as mock_cleanup:
 
-                with BaseScraper(sample_config) as scraper:
+                with _TestableBaseScraper(sample_config) as scraper:
                     assert scraper is not None
 
                 mock_setup.assert_called_once()

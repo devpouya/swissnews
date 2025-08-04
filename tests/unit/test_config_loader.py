@@ -98,6 +98,13 @@ outlets:
   invalid_outlet:
     name: "Invalid Outlet"
     # Missing required fields: url, language, selectors
+
+validation:
+  required_fields:
+    - name
+    - url
+    - language
+    - selectors
 """
 
     def test_initialization_with_custom_path(self):

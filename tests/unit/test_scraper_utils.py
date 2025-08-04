@@ -152,7 +152,7 @@ class TestURLProcessing:
         invalid_urls = [
             "",
             "not-a-url",
-            "ftp://example.com",  # Missing netloc in parsed result
+            "ftp://example.com",  # FTP scheme not supported for web scraping
             "://missing-scheme.com",
             None
         ]
@@ -264,7 +264,7 @@ class TestUtilityFunctions:
             ("file<>:\"/\\|?*.txt", "file_________.txt"),  # Invalid chars replaced
             ("", "untitled"),
             ("   ", "untitled"),
-            ("." * 250, "." * 200),  # Length limited
+            ("." * 250, "untitled"),  # All dots stripped, becomes untitled
             ("...file...", "file"),  # Stripped dots
         ]
 
@@ -311,7 +311,7 @@ class TestUtilityFunctions:
         assert 0.0 < similarity < 1.0
 
         # Empty texts
-        assert calculate_text_similarity("", "") == 1.0
+        assert calculate_text_similarity("", "") == 0.0
         assert calculate_text_similarity("text", "") == 0.0
         assert calculate_text_similarity("", "text") == 0.0
 

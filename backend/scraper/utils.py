@@ -100,7 +100,9 @@ def clean_text(text: str) -> str:
     text = re.sub(
         r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", "[email]", text
     )
-    text = re.sub(r"\+?[\d\s\-\(\)]{8,}", "[phone]", text)
+    text = re.sub(
+        r"\+[\d\s\-\(\)]{8,}", "[phone]", text
+    )  # Only match + prefixed numbers
 
     # Remove extra whitespace and normalize (after all replacements)
     text = re.sub(r"\s+", " ", text)
@@ -162,8 +164,10 @@ def is_valid_url(url: str) -> bool:
         True if URL is valid, False otherwise
     """
     try:
+        if not url:
+            return False
         parsed = urlparse(url)
-        return all([parsed.scheme, parsed.netloc])
+        return all([parsed.scheme in ("http", "https"), parsed.netloc])
     except Exception:
         return False
 
@@ -210,34 +214,41 @@ def is_article_url(url: str, article_patterns: Optional[List[str]] = None) -> bo
             r"/\d+/",  # Article IDs
         ]
 
-    url_lower = url.lower()
+        url_lower = url.lower()
 
-    # Check for article patterns
-    for pattern in article_patterns:
-        if re.search(pattern, url_lower):
-            return True
+        # Check for article patterns
+        for pattern in article_patterns:
+            if re.search(pattern, url_lower):
+                return True
 
-    # Exclude common non-article URLs
-    exclusion_patterns = [
-        r"/category/",
-        r"/tag/",
-        r"/author/",
-        r"/search",
-        r"/archive",
-        r"/feed",
-        r"/rss",
-        r"/sitemap",
-        r"/contact",
-        r"/about",
-        r"/impressum",
-        r"/datenschutz",
-    ]
+        # Exclude common non-article URLs (only for default patterns)
+        exclusion_patterns = [
+            r"/category/",
+            r"/tag/",
+            r"/author/",
+            r"/search",
+            r"/archive",
+            r"/feed",
+            r"/rss",
+            r"/sitemap",
+            r"/contact",
+            r"/about",
+            r"/impressum",
+            r"/datenschutz",
+        ]
 
-    for pattern in exclusion_patterns:
-        if re.search(pattern, url_lower):
-            return False
+        for pattern in exclusion_patterns:
+            if re.search(pattern, url_lower):
+                return False
 
-    return True
+        return True
+    else:
+        # Custom patterns provided - only check these
+        url_lower = url.lower()
+        for pattern in article_patterns:
+            if re.search(pattern, url_lower):
+                return True
+        return False
 
 
 def parse_date_string(date_str: str) -> Optional[datetime]:
@@ -275,7 +286,7 @@ def parse_date_string(date_str: str) -> Optional[datetime]:
 
     # Try parsing relative dates (German)
     if any(word in date_str.lower() for word in ["vor", "minutes", "stunden", "heute"]):
-        return datetime.now(timezone.utc)  # Approximate for relative dates
+        return datetime.now()  # Approximate for relative dates (timezone-naive)
 
     logger.warning(f"Could not parse date string: {date_str}")
     return None
