@@ -23,8 +23,7 @@ manageable tasks.
 - Commit your changes after each step.
 
 # TEST
-- Think hard on what the most useful tests would be, write at most 5 tests.
-- No more than 5 tests.
+- write at most 5 tests.
 - Run the full test suit to ensure you haven't broken anything
 - If the tests are failing, fix them.
 - Ensure that all tests are passing before moving to the next step
