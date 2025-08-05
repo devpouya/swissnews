@@ -7,7 +7,7 @@ Follow these steps:
 2. Understand the problem described in the issue
 3. Ask clarifying questions if necessary
 4. Understand the prior art for this issue
-- Search the scratchpads, read the first two lines of the file only for previous thoughts related to the issue
+- Search the scratchpads, read the first two lines (Summary and Outcome) of the file only for previous thoughts related to the issue
 - Search PRs to see if you can find history on this issue
 - Search the codebase for relevant files
 5. Think harder about how to break the issue down into a series of small,
