@@ -298,7 +298,7 @@ class DuplicateDetector:
             True if article should be updated
         """
         try:
-            # Always update if URLs match (same article, potentially updated content)
+            # Check if URLs match (same article, potentially updated content)
             if existing.get("url") == new.url:
                 # Check if content has actually changed
                 existing_content = existing.get("content", "")
@@ -311,33 +311,37 @@ class DuplicateDetector:
                     logger.info(f"Content changed for URL {new.url}, should update")
                     return True
 
-            # Check if new article has better quality score
-            existing_word_count = existing.get("word_count", 0)
-            new_word_count = new.word_count
+                # If content is the same, check for metadata improvements
+                existing_word_count = existing.get("word_count", 0)
+                new_word_count = new.word_count
 
-            if new_word_count > existing_word_count * 1.2:  # 20% more content
-                logger.info(
-                    f"New article has significantly more content "
-                    f"({new_word_count} vs {existing_word_count} words)"
-                )
-                return True
+                if new_word_count > existing_word_count * 1.2:  # 20% more content
+                    logger.info(
+                        f"New article has significantly more content "
+                        f"({new_word_count} vs {existing_word_count} words)"
+                    )
+                    return True
 
-            # Check if new article has more complete metadata
-            existing_author = existing.get("author")
-            new_author = new.author
+                # Check if new article has more complete metadata
+                existing_author = existing.get("author")
+                new_author = new.author
 
-            if not existing_author and new_author:
-                logger.info("New article has author information, should update")
-                return True
+                if not existing_author and new_author:
+                    logger.info("New article has author information, should update")
+                    return True
 
-            # Check publication date - prefer earlier/more accurate dates
-            existing_date = existing.get("publish_date")
-            new_date = new.publication_date
+                # Check publication date - prefer earlier/more accurate dates
+                existing_date = existing.get("publish_date")
+                new_date = new.publication_date
 
-            if not existing_date and new_date:
-                logger.info("New article has publication date, should update")
-                return True
+                if not existing_date and new_date:
+                    logger.info("New article has publication date, should update")
+                    return True
 
+                # Same URL, same content, no metadata improvements
+                return False
+
+            # Different URLs - don't update
             return False
 
         except Exception as e:
