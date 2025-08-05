@@ -11,7 +11,10 @@ Created: 2025-08-04
 import logging
 import os
 from contextlib import contextmanager
-from typing import Any, Dict, Generator, List, Optional, Type
+from typing import TYPE_CHECKING, Any, Dict, Generator, List, Optional, Tuple, Type
+
+if TYPE_CHECKING:
+    from backend.scraper.duplicates import DuplicateDetector
 from urllib.parse import urlparse
 
 import psycopg2
@@ -254,6 +257,7 @@ class ArticleRepository:
 
     def __init__(self, db_manager: DatabaseManager):
         self.db = db_manager
+        self._duplicate_detector: Optional["DuplicateDetector"] = None
 
     def get_recent_articles(self, limit: int = 50) -> List[Dict[str, Any]]:
         """Get recent articles with outlet information"""
@@ -295,9 +299,9 @@ class ArticleRepository:
                 text(
                     """
                 INSERT INTO articles (url, title, content, summary, author, publish_date,
-                                    language, outlet_id, is_paywalled, word_count, tags)
+                                    language, outlet_id, is_paywalled, word_count, tags, content_hash)
                 VALUES (:url, :title, :content, :summary, :author, :publish_date,
-                        :language, :outlet_id, :is_paywalled, :word_count, :tags)
+                        :language, :outlet_id, :is_paywalled, :word_count, :tags, :content_hash)
                 RETURNING id
                 """
                 ),
@@ -318,6 +322,268 @@ class ArticleRepository:
         with self.db.get_session() as session:
             result = session.execute(text("SELECT * FROM outlet_stats"))
             return [dict(row._mapping) for row in result]
+
+    @property
+    def duplicate_detector(self) -> "DuplicateDetector":
+        """Lazy-loaded duplicate detector instance"""
+        if self._duplicate_detector is None:
+            from backend.scraper.duplicates import DuplicateDetector
+
+            self._duplicate_detector = DuplicateDetector(self.db)
+        return self._duplicate_detector
+
+    def create_article_with_duplicate_check(self, article_data: Any) -> Tuple[int, str]:
+        """
+        Create article with comprehensive duplicate detection.
+
+        Args:
+            article_data: ArticleContent object or dict with article data
+
+        Returns:
+            Tuple[article_id, action] where action is:
+            - 'created': New article created
+            - 'updated': Existing article updated
+            - 'skipped': Duplicate found, no action taken
+        """
+        import time
+
+        from backend.scraper.extractors import ArticleContent
+
+        start_time = time.time()
+
+        try:
+            # Convert ArticleContent to dict if needed
+            if isinstance(article_data, ArticleContent):
+                article_dict = self._article_content_to_dict(article_data)
+                article_obj = article_data
+            else:
+                article_dict = article_data
+                # Create basic ArticleContent for duplicate detection
+                article_obj = ArticleContent(
+                    url=article_dict.get("url", ""),
+                    title=article_dict.get("title", ""),
+                    body_paragraphs=(
+                        article_dict.get("content", "").split("\n\n")
+                        if article_dict.get("content")
+                        else []
+                    ),
+                    author=article_dict.get("author"),
+                    publication_date=article_dict.get("publish_date"),
+                )
+
+            # 1. Check for URL duplicates first (fastest)
+            if self.duplicate_detector.is_duplicate_url(article_obj.url):
+                existing_article = self._get_article_by_url(article_obj.url)
+                if existing_article and self.duplicate_detector.should_update_article(
+                    existing_article, article_obj
+                ):
+                    # Update existing article
+                    article_id = self._update_article(
+                        existing_article["id"], article_dict
+                    )
+                    self._update_stats(
+                        detection_time_ms=int((time.time() - start_time) * 1000),
+                        articles_updated=1,
+                    )
+                    return article_id, "updated"
+                else:
+                    # Skip duplicate
+                    self._update_stats(
+                        detection_time_ms=int((time.time() - start_time) * 1000),
+                        articles_skipped=1,
+                        duplicates_url=1,
+                    )
+                    return existing_article["id"] if existing_article else 0, "skipped"
+
+            # 2. Check for content duplicates
+            content_text = " ".join(article_obj.body_paragraphs)
+            is_duplicate, match_info = self.duplicate_detector.is_duplicate_content(
+                article_obj.title, content_text
+            )
+
+            if is_duplicate and match_info:
+                best_match = (
+                    match_info["matched_articles"][0]
+                    if match_info["matched_articles"]
+                    else None
+                )
+                if best_match and self.duplicate_detector.should_update_article(
+                    best_match, article_obj
+                ):
+                    # Update existing article
+                    article_id = self._update_article(best_match["id"], article_dict)
+                    self._update_stats(
+                        detection_time_ms=match_info["detection_time_ms"],
+                        articles_updated=1,
+                    )
+                    return article_id, "updated"
+                else:
+                    # Skip duplicate
+                    self._update_stats(
+                        detection_time_ms=match_info["detection_time_ms"],
+                        articles_skipped=1,
+                        duplicates_content=1,
+                    )
+                    return best_match["id"] if best_match else 0, "skipped"
+
+            # 3. No duplicates found, create new article
+            # Calculate and add content hash
+            article_dict["content_hash"] = (
+                self.duplicate_detector.calculate_content_hash(content_text)
+            )
+
+            article_id = self.create_article(article_dict)
+            self._update_stats(
+                detection_time_ms=int((time.time() - start_time) * 1000),
+                articles_processed=1,
+            )
+
+            return article_id, "created"
+
+        except Exception as e:
+            logger.error(f"Error in create_article_with_duplicate_check: {e}")
+            # Fallback to basic creation without duplicate detection
+            try:
+                article_id = self.create_article(
+                    article_dict if "article_dict" in locals() else article_data
+                )
+                return article_id, "created"
+            except Exception as fallback_error:
+                logger.error(f"Fallback article creation failed: {fallback_error}")
+                raise
+
+    def find_duplicates_for_article(self, article_data: Any) -> List[Dict[str, Any]]:
+        """
+        Find all potential duplicates for an article using multiple strategies.
+
+        Args:
+            article_data: ArticleContent object or dict with article data
+
+        Returns:
+            List of potential duplicate articles with similarity information
+        """
+        try:
+            from backend.scraper.extractors import ArticleContent
+
+            # Convert to ArticleContent if needed
+            if isinstance(article_data, ArticleContent):
+                article_obj = article_data
+            else:
+                article_obj = ArticleContent(
+                    url=article_data.get("url", ""),
+                    title=article_data.get("title", ""),
+                    body_paragraphs=(
+                        article_data.get("content", "").split("\n\n")
+                        if article_data.get("content")
+                        else []
+                    ),
+                    author=article_data.get("author"),
+                    publication_date=article_data.get("publish_date"),
+                )
+
+            return self.duplicate_detector.find_similar_articles(article_obj)
+
+        except Exception as e:
+            logger.error(f"Error finding duplicates for article: {e}")
+            return []
+
+    def get_articles_by_content_hash(self, content_hash: str) -> List[Dict[str, Any]]:
+        """
+        Fast lookup of articles by content hash.
+
+        Args:
+            content_hash: SHA-256 hash of article content
+
+        Returns:
+            List of articles with matching content hash
+        """
+        try:
+            with self.db.get_session() as session:
+                result = session.execute(
+                    text(
+                        """
+                        SELECT id, url, title, content, author, publish_date, content_hash,
+                               word_count, scraped_at, updated_at
+                        FROM articles
+                        WHERE content_hash = :hash
+                        ORDER BY scraped_at DESC
+                    """
+                    ),
+                    {"hash": content_hash},
+                )
+                return [dict(row._mapping) for row in result]
+        except Exception as e:
+            logger.error(f"Error getting articles by content hash: {e}")
+            return []
+
+    def _article_content_to_dict(self, article: Any) -> Dict[str, Any]:
+        """Convert ArticleContent object to dictionary for database insertion."""
+        return {
+            "url": article.url,
+            "title": article.title or "",
+            "content": (
+                "\n\n".join(article.body_paragraphs) if article.body_paragraphs else ""
+            ),
+            "summary": getattr(article, "summary", None),
+            "author": article.author,
+            "publish_date": article.publication_date,
+            "language": article.language,
+            "outlet_id": getattr(article, "outlet_id", None),
+            "is_paywalled": getattr(article, "is_paywalled", False),
+            "word_count": article.word_count or 0,
+            "tags": article.tags or [],
+        }
+
+    def _get_article_by_url(self, url: str) -> Optional[Dict[str, Any]]:
+        """Get article by URL with all details."""
+        try:
+            with self.db.get_session() as session:
+                result = session.execute(
+                    text(
+                        """
+                        SELECT id, url, title, content, author, publish_date, content_hash,
+                               word_count, scraped_at, updated_at, language, outlet_id,
+                               is_paywalled, tags
+                        FROM articles
+                        WHERE url = :url
+                    """
+                    ),
+                    {"url": url},
+                )
+                row = result.fetchone()
+                return dict(row._mapping) if row else None
+        except Exception as e:
+            logger.error(f"Error getting article by URL: {e}")
+            return None
+
+    def _update_article(self, article_id: int, article_data: Dict[str, Any]) -> int:
+        """Update existing article with new data."""
+        try:
+            with self.db.get_session() as session:
+                session.execute(
+                    text(
+                        """
+                        UPDATE articles
+                        SET title = :title, content = :content, summary = :summary,
+                            author = :author, publish_date = :publish_date,
+                            word_count = :word_count, tags = :tags, content_hash = :content_hash,
+                            updated_at = CURRENT_TIMESTAMP
+                        WHERE id = :id
+                    """
+                    ),
+                    {**article_data, "id": article_id},
+                )
+                return article_id
+        except Exception as e:
+            logger.error(f"Error updating article {article_id}: {e}")
+            raise
+
+    def _update_stats(self, **kwargs: Any) -> None:
+        """Update duplicate detection statistics."""
+        try:
+            self.duplicate_detector.update_detection_stats(**kwargs)
+        except Exception as e:
+            logger.warning(f"Failed to update detection stats: {e}")
 
 
 # Global database manager instance
