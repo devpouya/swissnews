@@ -192,7 +192,7 @@ HOST={os.uname().nodename}
     def log_run_metrics(self, metrics: Dict[str, Any]) -> None:
         """Log run metrics to database."""
         try:
-            with self.db_manager.get_connection() as conn:
+            with self.db_manager.get_raw_connection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute("""
                         UPDATE scraping_runs 
@@ -222,7 +222,7 @@ HOST={os.uname().nodename}
         
         # Mark run as aborted in database
         try:
-            with self.db_manager.get_connection() as conn:
+            with self.db_manager.get_raw_connection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute("""
                         UPDATE scraping_runs 
@@ -244,7 +244,7 @@ HOST={os.uname().nodename}
     def _initialize_run(self) -> None:
         """Initialize a new scraping run in the database."""
         try:
-            with self.db_manager.get_connection() as conn:
+            with self.db_manager.get_raw_connection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute("""
                         INSERT INTO scraping_runs (run_id, status, lock_file_path)
@@ -348,7 +348,7 @@ HOST={os.uname().nodename}
     def _finalize_run(self, results: Dict[str, Any], total_duration: int) -> None:
         """Finalize the scraping run in the database."""
         try:
-            with self.db_manager.get_connection() as conn:
+            with self.db_manager.get_raw_connection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute("""
                         UPDATE scraping_runs 
@@ -380,7 +380,7 @@ HOST={os.uname().nodename}
     def _mark_run_failed(self, error_message: str, duration: int) -> None:
         """Mark the current run as failed in the database."""
         try:
-            with self.db_manager.get_connection() as conn:
+            with self.db_manager.get_raw_connection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute("""
                         UPDATE scraping_runs 
@@ -398,7 +398,7 @@ HOST={os.uname().nodename}
     def _log_outlet_start(self, outlet_name: str, outlet_url: str) -> None:
         """Log the start of outlet processing."""
         try:
-            with self.db_manager.get_connection() as conn:
+            with self.db_manager.get_raw_connection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute("""
                         INSERT INTO scraping_run_outlets 
@@ -414,7 +414,7 @@ HOST={os.uname().nodename}
                              result: Dict[str, Any], duration: int) -> None:
         """Log the completion of outlet processing."""
         try:
-            with self.db_manager.get_connection() as conn:
+            with self.db_manager.get_raw_connection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute("""
                         UPDATE scraping_run_outlets 
@@ -440,7 +440,7 @@ HOST={os.uname().nodename}
                          error_message: str, duration: int = 0) -> None:
         """Log an error for outlet processing."""
         try:
-            with self.db_manager.get_connection() as conn:
+            with self.db_manager.get_raw_connection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute("""
                         UPDATE scraping_run_outlets 

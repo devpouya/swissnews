@@ -117,7 +117,7 @@ def check_status() -> Dict[str, Any]:
     try:
         db_manager = DatabaseManager()
         
-        with db_manager.get_connection() as conn:
+        with db_manager.get_raw_connection() as conn:
             with conn.cursor() as cursor:
                 # Get recent runs
                 cursor.execute("""

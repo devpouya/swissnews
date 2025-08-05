@@ -38,7 +38,7 @@ def mock_db_manager():
     mock_connection.cursor.return_value.__enter__.return_value = mock_cursor
     mock_connection.cursor.return_value.__exit__.return_value = None
     
-    mock_db.get_connection.return_value = mock_connection
+    mock_db.get_raw_connection.return_value = mock_connection
     
     return mock_db
 
@@ -128,7 +128,7 @@ class TestScrapingRunTracking:
 
     def test_run_initialization_and_finalization(self, scheduler, mock_db_manager):
         """Test complete run lifecycle in database."""
-        mock_cursor = mock_db_manager.get_connection.return_value.__enter__.return_value.cursor.return_value.__enter__.return_value
+        mock_cursor = mock_db_manager.get_raw_connection.return_value.__enter__.return_value.cursor.return_value.__enter__.return_value
         
         # Test run initialization
         scheduler._initialize_run()
@@ -158,7 +158,7 @@ class TestScrapingRunTracking:
 
     def test_run_failure_tracking(self, scheduler, mock_db_manager):
         """Test error handling and failure tracking."""
-        mock_cursor = mock_db_manager.get_connection.return_value.__enter__.return_value.cursor.return_value.__enter__.return_value
+        mock_cursor = mock_db_manager.get_raw_connection.return_value.__enter__.return_value.cursor.return_value.__enter__.return_value
         
         error_message = "Database connection failed"
         duration = 30
@@ -173,7 +173,7 @@ class TestScrapingRunTracking:
 
     def test_outlet_processing_logs(self, scheduler, mock_db_manager):
         """Test per-outlet logging functionality."""
-        mock_cursor = mock_db_manager.get_connection.return_value.__enter__.return_value.cursor.return_value.__enter__.return_value
+        mock_cursor = mock_db_manager.get_raw_connection.return_value.__enter__.return_value.cursor.return_value.__enter__.return_value
         
         outlet_name = "test_outlet"
         outlet_url = "https://test.com"
@@ -204,7 +204,7 @@ class TestGracefulShutdown:
 
     def test_shutdown_signal_handling(self, scheduler, mock_db_manager):
         """Test graceful shutdown with signal handling."""
-        mock_cursor = mock_db_manager.get_connection.return_value.__enter__.return_value.cursor.return_value.__enter__.return_value
+        mock_cursor = mock_db_manager.get_raw_connection.return_value.__enter__.return_value.cursor.return_value.__enter__.return_value
         
         # Create a lock file first
         scheduler.create_lock_file()
