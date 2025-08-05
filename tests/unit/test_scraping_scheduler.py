@@ -20,10 +20,9 @@ from unittest.mock import MagicMock, patch, call
 import psutil
 import pytest
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../backend'))
-
-from database.connection import DatabaseManager
-from scraper.scheduler import ScrapingScheduler
+# Import from backend module when running from project root
+from backend.database.connection import DatabaseManager
+from backend.scraper.scheduler import ScrapingScheduler
 
 
 @pytest.fixture
