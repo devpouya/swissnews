@@ -15,11 +15,10 @@ from datetime import datetime, timedelta
 from difflib import SequenceMatcher
 from typing import Any, Dict, List, Optional, Tuple
 
+from database.connection import DatabaseManager
 from loguru import logger
+from scraper.extractors import ArticleContent
 from sqlalchemy import text
-
-from backend.database.connection import DatabaseManager
-from backend.scraper.extractors import ArticleContent
 
 
 class DuplicateDetectionConfig:

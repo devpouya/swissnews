@@ -8,15 +8,19 @@ as specified in Issue #5.
 Maximum 5 tests as per issue requirements.
 """
 
+import sys
+import os
 import time
 from datetime import datetime, timedelta
 from unittest.mock import MagicMock, patch
 
 import pytest
 
-from backend.database.connection import DatabaseManager
-from backend.scraper.duplicates import DuplicateDetector
-from backend.scraper.extractors import ArticleContent
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../backend'))
+
+from database.connection import DatabaseManager
+from scraper.duplicates import DuplicateDetector
+from scraper.extractors import ArticleContent
 
 
 @pytest.fixture
