@@ -80,7 +80,7 @@ class ScrapingScheduler:
             self._initialize_run()
             
             # Load outlet configurations
-            outlets_config = self.config_loader.load_outlets_config()
+            outlets_config = self.config_loader.load_config()
             
             # Run scraping for each outlet
             results = self._scrape_all_outlets(outlets_config)
