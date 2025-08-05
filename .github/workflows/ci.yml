@@ -45,9 +45,8 @@ jobs:
 
     - name: Install backend dependencies
       run: |
-        cd backend
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        pip install -r backend/requirements.txt
 
 
     - name: Run backend unit tests
@@ -58,8 +57,7 @@ jobs:
         DB_USER: postgres
         DB_PASSWORD: postgres
       run: |
-        cd backend
-        pytest ../tests/unit/ -v --cov=. --cov-report=xml
+        pytest tests/unit/ -v --cov=backend --cov-report=xml
 
     - name: Run backend integration tests
       env:
@@ -69,13 +67,12 @@ jobs:
         DB_USER: postgres
         DB_PASSWORD: postgres
       run: |
-        cd backend
-        pytest ../tests/integration/ -v --cov=. --cov-report=xml --cov-append
+        pytest tests/integration/ -v --cov=backend --cov-report=xml --cov-append
 
     - name: Upload backend coverage reports
       uses: codecov/codecov-action@v3
       with:
-        file: ./backend/coverage.xml
+        file: ./coverage.xml
         flags: backend
         name: backend-coverage
         fail_ci_if_error: false
@@ -156,8 +153,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-        cd backend && pip install -r requirements.txt
-        cd ../frontend && npm ci --legacy-peer-deps
+        pip install -r backend/requirements.txt
+        cd frontend && npm ci --legacy-peer-deps
         npx playwright install --with-deps
 
     - name: Set up test database
@@ -168,8 +165,7 @@ jobs:
         DB_USER: postgres
         DB_PASSWORD: postgres
       run: |
-        cd backend
-        python database/test_schema.py || echo "Database setup completed with warnings"
+        python backend/database/test_schema.py || echo "Database setup completed with warnings"
 
     - name: Run E2E tests
       env:

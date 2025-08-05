@@ -99,9 +99,9 @@ class TestCIFixes:
         with open(ci_config_path, 'r') as f:
             ci_content = f.read()
         
-        # Verify test paths are configured correctly
-        assert 'pytest ../tests/unit/' in ci_content, "Backend unit test path incorrect"
-        assert 'pytest ../tests/integration/' in ci_content, "Backend integration test path incorrect"
+        # Verify test paths are configured correctly (running from project root)
+        assert 'pytest tests/unit/' in ci_content, "Backend unit test path incorrect"
+        assert 'pytest tests/integration/' in ci_content, "Backend integration test path incorrect"
 
 
 class TestFrontendFixes:
