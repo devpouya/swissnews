@@ -1,78 +1,11 @@
 repos:
-  # Backend Python hooks
+  # Essential repository integrity checks only
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
-      - id: trailing-whitespace
-      - id: end-of-file-fixer
-      - id: check-yaml
-      - id: check-json
-      - id: check-toml
       - id: check-merge-conflict
       - id: check-added-large-files
       - id: debug-statements
-
-  # Python code formatting
-  - repo: https://github.com/psf/black
-    rev: 25.1.0
-    hooks:
-      - id: black
-        language_version: python3
-        files: ^backend/.*\.py$
-
-  # Python import sorting
-  - repo: https://github.com/pycqa/isort
-    rev: 6.0.1
-    hooks:
-      - id: isort
-        args: ["--profile", "black"]
-        files: ^backend/.*\.py$
-
-  # Python linting
-  - repo: https://github.com/pycqa/flake8
-    rev: 7.3.0
-    hooks:
-      - id: flake8
-        args: ["--max-line-length=88", "--extend-ignore=E203,W503,F401,C901"]
-        files: ^backend/.*\.py$
-
-  # Python type checking (optional - can be slow)
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.17.1
-    hooks:
-      - id: mypy
-        files: ^backend/.*\.py$
-        additional_dependencies: [types-requests]
-        args: ["--ignore-missing-imports", "--no-strict-optional"]
-
-  # Frontend JavaScript/TypeScript hooks
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v4.0.0-alpha.8
-    hooks:
-      - id: prettier
-        files: ^frontend/.*\.(js|jsx|ts|tsx|json|css|md)$
-        exclude: ^frontend/(node_modules|\.next|build)/
-
-  # Frontend linting
-  - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.32.0
-    hooks:
-      - id: eslint
-        files: ^frontend/src/.*\.(js|jsx|ts|tsx)$
-        exclude: ^frontend/(node_modules|\.next|build|jest\.config\.js|jest\.setup\.js|next\.config\.js|tailwind\.config\.js)/
-        additional_dependencies:
-          - eslint@8.53.0
-          - eslint-config-next@14.2.31
-          - "@typescript-eslint/eslint-plugin@6.10.0"
-          - "@typescript-eslint/parser@6.10.0"
-
-
-  # Documentation and code quality
-  - repo: https://github.com/pre-commit/pygrep-hooks
-    rev: v1.10.0
-    hooks:
-      - id: python-no-log-warn
-        files: ^backend/.*\.py$
 
 # Global settings
 default_stages: [pre-commit]

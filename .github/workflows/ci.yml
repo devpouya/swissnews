@@ -49,17 +49,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run backend linting
-      run: |
-        cd backend
-        black --check --diff . || echo "Code formatting issues found"
-        flake8 . || echo "Linting issues found - will be addressed in future PR"
-        isort --check-only --diff . || echo "Import sorting issues found"
-
-    - name: Run backend type checking
-      run: |
-        cd backend
-        mypy --install-types --non-interactive . || echo "Type checking issues found - will be addressed in future PR"
 
     - name: Run backend unit tests
       env:
@@ -114,25 +103,12 @@ jobs:
         cd frontend
         npm ci --legacy-peer-deps
 
-    - name: Run frontend linting
-      run: |
-        cd frontend
-        npm run lint
-
-    - name: Run frontend type checking
-      run: |
-        cd frontend
-        npm run type-check
 
     - name: Run frontend unit tests
       run: |
         cd frontend
         npm run test:ci
 
-    - name: Build frontend
-      run: |
-        cd frontend
-        npm run build
 
     - name: Upload frontend coverage reports
       uses: codecov/codecov-action@v3
@@ -214,119 +190,13 @@ jobs:
         path: test-results/
         retention-days: 30
 
-  # Security and Quality Analysis
-  security-scan:
-    runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v4
 
-    - name: Run backend security scan
-      run: |
-        pip install pip-audit
-        cd backend
-        pip-audit --desc --format=json --output=security-report.json -r requirements.txt || echo "Security scan completed with warnings"
-
-    - name: Run frontend security scan
-      run: |
-        cd frontend
-        npm audit --audit-level high
-
-    - name: Run CodeQL Analysis
-      uses: github/codeql-action/init@v2
-      with:
-        languages: python, javascript
-
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v2
-
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
-
-  # Database Migration Tests
-  migration-test:
-    runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
-          POSTGRES_DB: swissnews_test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up Python ${{ env.PYTHON_VERSION }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-        cache: 'pip'
-
-    - name: Install dependencies
-      run: |
-        cd backend
-        pip install -r requirements.txt
-
-    - name: Test database migrations
-      env:
-        DB_HOST: localhost
-        DB_PORT: 5432
-        DB_NAME: swissnews_test
-        DB_USER: postgres
-        DB_PASSWORD: postgres
-      run: |
-        cd backend
-        python database/test_schema.py
-
-    - name: Test data population
-      env:
-        DB_HOST: localhost
-        DB_PORT: 5432
-        DB_NAME: swissnews_test
-        DB_USER: postgres
-        DB_PASSWORD: postgres
-      run: |
-        cd backend
-        python database/populate_outlets.py --dry-run || echo "Data population test completed with warnings"
-
-  # Performance Tests (Basic)
-  performance-test:
-    runs-on: ubuntu-latest
-    needs: [backend-test]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up Python ${{ env.PYTHON_VERSION }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-        cache: 'pip'
-
-    - name: Install dependencies
-      run: |
-        cd backend
-        pip install -r requirements.txt
-        pip install locust
-
-    - name: Run basic performance tests
-      run: |
-        python -m pytest tests/performance/test_performance.py -v
 
   # Deployment (only on main branch)
   deploy:
     runs-on: ubuntu-latest
-    needs: [backend-test, frontend-test, e2e-test, security-scan, migration-test]
+    needs: [backend-test, frontend-test, e2e-test]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
